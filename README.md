@@ -60,6 +60,17 @@ You can now find your new cv2 rando rom in the `/path/to/cv2r/tmp` folder
 
 ## developer notes
 
+### Screen dimensions
+
+Screen width, in tiles, is always a multiple of `0x10` and height is a multiple of `0x0E`. The maximum width and height is 4 screens, with the only screen actually being `0x40`x`0x38` is Castlevania.
+
+| # of screens | width | height |
+|--------------|-------|--------|
+| 1            | 0x10  | 0x0E   |
+| 2            | 0x20  | 0x1C   |
+| 3            | 0x30  | 0x2A   |
+| 4            | 0x40  | 0x38   |
+
 ### Death Fight
 
 `01:8D1C` execute breakpoint with X==#7
@@ -256,6 +267,12 @@ objset | pattern pointers | bg   | sprite | name
 3      | 0x1CCFF          | 0x04 | 0x05   | woods 2
 4      | 0x1CD01          | 0x06 | 0x07   | graveyard
 5      | 0x1CD03          | 0x0B | 0x0C   | castlevania
+
+oak
+----
+0x03 woods1 fishman spitting head
+0x05 woods2 flames???
+0x07 graveyard oprn flower
 
 ### random notes
 
