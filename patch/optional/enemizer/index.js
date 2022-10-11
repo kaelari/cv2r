@@ -23,10 +23,16 @@ const spritePatternMap = [ 0x01, 0x0A, 0x03, 0x05, 0x07, 0x0C ];
 // const bgPatternMap = [ 0x00, 0x08, 0x02, 0x04, 0x06, 0x0B ];
 
 module.exports = {
+	pre: true,
+	order: 100,
+	id: "enemizer",
+	name: 'Enemizer',
+	description: 'Randomize Enemies',
 	patch: async function(pm, opts) {
+	
 		const { rng } = opts;
 		let deadRiverToBrahm;
-
+		
 		// *** First pass ****
 		// Write individual bg/sprite pattern table id for every single screen in the game.
 		// Currently we're randomizing only the sprite table (for enemies), not the

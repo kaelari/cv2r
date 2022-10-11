@@ -65,10 +65,12 @@ module.exports = {
 
 		global.spoiler.forEach(spoil => {
 			let [item, actor, location, entryRoom] = spoil;
-
+			
 			// don't leave clues for jova
 			if (location.includes('Jova')) { return; }
-
+			
+			const fulllocation = location;
+			
 			// remove location descriptors
 			location = location.replace(/-.*/, '');
 
@@ -94,9 +96,10 @@ module.exports = {
 
 			} else if (actor === 'merchant') {
 				if (isDoorRando) {
-					const sp = global.doorSpoiler.find(s => s[1] === entryRoom);
+					const sp = global.doorSpoiler.find(s => s[1] === entryRoom || s[1] ===fulllocation );
 					if (!sp) {
 						clues.push(`${fullWrap(item)} for sale in ${location} door`);
+						
 					} else {
 						const door = sp[0].substring(0, sp[0].indexOf(' '));
 						clues.push(`Enter a door at ${door} to buy ${item}`);
@@ -167,7 +170,7 @@ module.exports = {
 
 				const textBytes = textToBytes(clues[index]);
 				pm.add(textBytes, a.textPointer);
-
+				
 				// delete so we don't give the same clue twice
 				clues.splice(index, 1);
 			});

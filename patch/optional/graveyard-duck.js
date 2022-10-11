@@ -8,7 +8,8 @@ const DUCK = '00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 
 module.exports = {
 	id: 'graveyard-duck',
 	name: 'Graveyard Duck',
-	description: '',
+	requires: 'enemizer',
+	description: 'Replaces "duck" merchant with an actual duck',
 	patch: function(pm) {
 		const graveyard = core.find(loc => loc.objset === 3 && loc.area === 1 && loc.submap === 0);
 		const spriteTable = graveyard.pattern.value & 0x0F;
