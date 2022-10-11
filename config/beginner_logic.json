@@ -1,0 +1,25 @@
+[
+	{
+		"name": "Jova",
+		"actors": [
+			{"mustHave": "thorn whip"} 
+		]
+	},
+	{
+		"name": "Jova - Thorn Whip Room",
+		"actors": [
+			{"mustHave": "laurels"}
+		]
+	},
+	{
+		"name": "Jova - Holy Water Room",
+		"actors": [
+			{"mustHave": "oak stake"}
+		]
+	}
+	
+	
+	
+]
+
+

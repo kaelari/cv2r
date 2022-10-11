@@ -9,6 +9,7 @@ const FERRY_MAN = 0xBC;
 module.exports = {
 	id: 'lazy-river',
 	name: 'Lazy River',
+	requires: 'enemizer',
 	description: 'Only spawn fishmen on Dead River, like vanilla CV2',
 	patch: function(pm) {
 		const { core } = require('../../lib');
