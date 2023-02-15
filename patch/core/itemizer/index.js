@@ -73,10 +73,11 @@ function randomize(rng, { logic }) {
 
 	// attach an item randomly to an actor
 	const itemKeys = ['HOLY_WATER', 'WHITE_CRYSTAL', 'BLUE_CRYSTAL', 'RED_CRYSTAL', 'OAK_STAKE', 'HEART',
-		'LAURELS', 'GARLIC', 'NAIL', 'DIAMOND', 'MAGIC_CROSS'];
+		'LAURELS', 'GARLIC', 'NAIL', 'DIAMOND', 'MAGIC_CROSS', 'RING', 'EYEBALL', 'RIB'];
 	const baseFuncs = {};
 	itemKeys.forEach(ik => {
 		baseFuncs[ik] = `base.${ik} = function ${ik}() { return true; };`;
+		
 	});
 
 	function processItem(item, isDep) {
@@ -85,7 +86,7 @@ function randomize(rng, { logic }) {
 		const itemToKey = i => i.toUpperCase().replace(/\s+/g, '_');
 		const funcs = Object.assign({}, baseFuncs);
 		funcs[itemToKey(item)] = `base.${itemToKey(item)} = function ${itemToKey(item)}() { return false; };`;
-
+	
 		// remove dependency from item list (yet to be placed items)
 		const index = itemList.findIndex(i => i === item);
 		itemList.splice(index, 1);
@@ -94,7 +95,7 @@ function randomize(rng, { logic }) {
 		let funcCode = `
 // generate logic functions with "visited" checks to prevent infinite loop
 const base = {};
-const items = [ 'HOLY_WATER', 'WHITE_CRYSTAL', 'BLUE_CRYSTAL', 'RED_CRYSTAL', 'OAK_STAKE', 'LAURELS', 'NAIL', 'HEART', 'GARLIC', 'DIAMOND', 'MAGIC_CROSS' ];
+const items = [ 'HOLY_WATER', 'WHITE_CRYSTAL', 'BLUE_CRYSTAL', 'RED_CRYSTAL', 'OAK_STAKE', 'LAURELS', 'NAIL', 'HEART', 'GARLIC', 'DIAMOND', 'MAGIC_CROSS', 'EYEBALL', 'RIB', 'RING' ];
 const funcs = {};
 items.forEach(item => {
 	funcs[item] = function(v) {
@@ -127,6 +128,7 @@ const clone = () => Object.assign({}, visited);
 			choices = actors.filter(actor => {
 				if (actor.newItem) { return false; }
 				if (actor.mustHave != null && actor.mustHave != item) {return false;}
+				if (actor.name === "merchant" && item === "clue"){return false;}
 				if (!isDep) { return true; }
 				if (actor.requirements[logic] === '') { return true; }
 				const script = new vm.Script(funcCode + evalLogic(actor.requirements[logic]));
@@ -135,7 +137,7 @@ const clone = () => Object.assign({}, visited);
 		}
 		// bail if we can't find an available actor
 		if (!choices.length) {
-			console.log("bailing! "+item);
+			
 			throw new Error(`cannot find free actor for ${item}`);
 		}
 
@@ -205,6 +207,7 @@ function modSaleData(pm) {
 	const saleValues = {};
 	let saleOffset = mod.length;
 	function addSaleData(itemType) {
+		
 		saleValues[itemType] = saleOffset.toString(16);
 		const romLoc = saleBank.rom.start + saleBank.offset;
 		pm.add([0, 0, 0], romLoc);
@@ -243,21 +246,46 @@ module.exports = {
 		// initialize items
 		opts.hasFangs = opts.patch && /(^|,)fangs($|,)/.test(opts.patch);
 		items.initItems(pm, rng, opts);
-
+		if (opts.world){
+			opts.worlddataactors[opts.world].forEach ( actor => {
+				
+				const actors =    core
+		.filter(c => c.actors)
+		.map(c => c.actors.filter(a => a.holdsItem))
+		.filter(c => c.length > 0)
+		.reduce((a, c) => a.concat(c), []);
+				actors.forEach((a, index) => {
+					if (actor.name === a.name && actor.locationName===a.locationName) {
+						a.itemName = actor.itemName;
+						const arr = a.itemName.match(/[0-9]+$/)[0];
+						if (arr) {
+							
+							a.destworld=arr;
+							a.itemName= a.itemName.slice(0, -1);
+							
+						}
+						
+						
+					}
+					
+					
+				});
+			})
+		}else {
 		// randomize game items amongst all available actors. Retry if necessary.
-		function wrapper() {
-			try {
-				randomize(rng, opts);
-			} catch (err) {
-				if (err.message.includes('cannot find free actor')) {
-					wrapper();
-				} else {
-					throw err;
+			function wrapper() {
+				try {
+					randomize(rng, opts);
+				} catch (err) {
+					if (err.message.includes('cannot find free actor')) {
+						wrapper();
+					} else {
+						throw err;
+					}
 				}
 			}
+			wrapper();
 		}
-		wrapper();
-
 		// write all merchant sale icon and price data
 		const saleLoc = modSaleData(pm);
 
@@ -322,21 +350,37 @@ module.exports = {
 
 		let spoiler = [['item', 'actor', 'location', 'entry room']];
 		log('', true);
+		
 		itemActors.forEach(actor => {
 			let jsrBuf;
-			const item = items.find(i => i.name === actor.itemName);
-
+			let item = items.find(i => i.name === actor.itemName);
+			if (opts.world){
+				item = items.find(i => i.name === actor.itemName && i.destworld == actor.destworld);
+			}
 			// garlic and laurels subroutine needs to access the appropriate bank
 			if (['garlic', 'laurels'].includes(item.name) || item.whip || item.crystal) {
-				item.code = item.bankCode[actor.bank];
-				item.codeBytes = assemble(item.code);
+				if ((actor.name === "crystal dude" || actor.name ==="secret merchant") && ['garlic', 'laurels'].includes(item.name)){
+					
+					item.code = item.freeBankCode[actor.bank];
+					item.codeBytes = assemble(item.code);
+				}else {
+					
+					item.code = item.bankCode[actor.bank];
+					item.codeBytes = assemble(item.code);
+					
+				}
+				
 			}
 
 			// change actor text to match new item
-			if (item && item.text) { actor.text = item.text; }
-
+			if (item && item.text) { 
+				if (opts.multiworld && item.destworld != opts.world){
+						actor.text = item.text;
+				}else {	actor.text = item.text; }
+			}
 			// Write new text pointers for each individual garlic/laurel/oak merchant
 			if (sharedItemTypes.includes(actor.itemType)) {
+				
 				const textRomLoc = bank[3].rom.start + bank[3].offset;
 				const textRamLoc = bank[3].ram.start + bank[3].offset;
 				const lowByte = (textRamLoc & 0xFF).toString(16);
@@ -420,8 +464,9 @@ STA *$01
 			// specific handling for merchants that covers text, sales icons, and prices
 			if (actor.name === 'merchant') {
 				// handle text for merchant
-				if (!item.crystal && !item.whip) {
+				if (!item.crystal && !item.whip && item.name !== "clue") {
 					actor.text = `${item.name.replace(' ', '\n')}?`;
+					
 				}
 
 				// handle price and sales icon
@@ -441,9 +486,9 @@ STA *$01
 
 			const entryRoom = core.find(loc => loc.name === actor.locationName).entryRoom || '';
 
-			log(`${pad(item.name, 15)} | ${pad(actor.name + (actor.name === 'merchant' ? ' (' + item.price + ')' : ''), 15)} | ${actor.locationName}`, true);
+			log(`${pad(item.name+actor.destworld, 15)} | ${pad(actor.name + (actor.name === 'merchant' ? ' (' + item.price + ')' : ''), 15)} | ${actor.locationName}`, true);
 			spoiler.push([item.name, actor.name, actor.locationName, entryRoom]);
-		});
+		}  );
 
 		// TODO: resolve this laziness
 		global.spoiler = spoiler;

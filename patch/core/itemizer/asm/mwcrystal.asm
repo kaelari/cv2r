@@ -6,8 +6,8 @@ LDY #$00
 
 CHECK LDA $6110,Y
 CMP #$00
-BEQ WHIP
-CMP *$7F
+BEQ CRYS
+CMP $7F
 BNE NEXT
 
 LDA $6111,Y
@@ -28,14 +28,14 @@ BNE NEXT
 BEQ DONE
 
 NEXT CPY #$80
-BEQ WHIP
+BEQ CRYS
 INY
 INY
 INY
 INY
 BNE CHECK
 
-WHIP 
+CRYS 
 LDA $7F
 STA $6110,Y
 LDA *$30
@@ -46,6 +46,9 @@ LDA *$51
 AND #$7
 STA $6113,Y
 
+; if ($7F == 0x26 || $7F < 0x1D || $7F > 0x37)  {
+;   $600E = 0x01
+; }
 LDA *$7F
 CMP #$26
 BEQ MARK
@@ -55,13 +58,16 @@ CMP #$38
 BCC NOMARK
 MARK STA $600E
 
-NOMARK INC $434
+NOMARK LDA $<%= ram %>
+CLC
+ADC #$20
+STA $<%= ram %>
 
 DONE
 PLA
 TAY
 PLP
 
-LDA $434
+LDA $<%= ram%>
 
 RTS

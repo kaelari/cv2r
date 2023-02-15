@@ -125,7 +125,11 @@ module.exports = {
 				if (a.noZigZagBat) {
 					filteredEnemies = filteredEnemies.filter(e => e.name !== 'zigzag bat');
 				}
-
+				
+				// remove spider from begining of rover as it breaks rover wrong warp into glitch laruba
+				if (a.nospider) {
+					filteredEnemies = filteredEnemies.filter(e => e.name !== 'spider');
+				}
 				// hey look, a new enemy!
 				const len = filteredEnemies.length;
 				const newEnemy = filteredEnemies[randomInt(rng, 0, len - 1)];

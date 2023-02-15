@@ -305,9 +305,14 @@ function copytown (town1, town2, pm, logic){
 			pm.add(fromrightvalue, towns[town1].fromrightoffset);	
 		}
 		
-		
+		const coredata = core.find(c => c.name == town1);
 		//adjust logic
-		towns[town2].reqs = core.find(c => c.name == town1).doors.requirements[logic];
+		towns[town2].reqs = coredata.doors.requirements[logic];
+		if (coredata.tornadodest >0 ){
+			towns[town2].cantornado = coredata.tornadodest;
+		}else {
+			towns[town2].cantornado = 0;
+		}
 		log(town2+" new town reqs:" +towns[town2].reqs);
 		
 		
@@ -391,8 +396,8 @@ module.exports = {
 			let townReqs = towns[town].reqs;
 			let location = core.find(c=> c.name ===town );
 			location.doors.requirements[logic] = townReqs;
-				
-				
+			location.tornadodest = towns[town].cantornado;
+			
 			
 			const actors = core
 				.filter(loc => loc.name === town)
