@@ -3,11 +3,12 @@ const items = require('../patch/core/itemizer/items');
 const pm = require('../lib/patch-manager');
 const vm = require('vm');
 const { pad, randomInt } = require('../lib/utils');
-
-const DEBUG = true;
+const fs = require('fs')
+const DEBUG = false;
 const LOGICS = ['standard', 'glitch'];
 const numOfWorlds = parseInt(process.argv[2] || '1', 10);
 const seed = process.argv[3];
+const fangs = process.argv[4];
 const itemList = [];
 const itemKeys = [];
 let worlds = [];
@@ -22,7 +23,8 @@ try {
 	console.error(err.stack);
 	process.exit(1);
 }
-items.initItems(pm.core, rng, {});
+items.initItems(pm.core, rng, {'fangs': fangs});
+
 
 for (let i = 1; i <= numOfWorlds; i++) {
 	// get item actor list for each world
@@ -179,4 +181,50 @@ const clone = () => Object.assign({}, visited);
 }
 
 const finalLogic = randomize(rng, { logic: 'standard' });
-//console.log(finalLogic);
+var data={};
+for (i=1; i<= numOfWorlds; i++){
+	data[i]=[];
+	
+}
+const finalitems = [];
+finalLogic.forEach ( actor => {
+	var foo = {};
+	foo.locationName =actor.locationName;
+	foo.name = actor.name;
+	foo.itemName = actor.itemName;
+	foo.world = actor.world;
+	const destworld = actor.itemName.match(/[0-9]+$/)[0];
+	foo.destworld = destworld;
+	data[actor.world].push(foo);
+	//console.log(actor);
+	const name = actor.itemName.slice(0, -1);
+	var item = items.find(i => i.name === name);
+	let itemnew = JSON.parse(JSON.stringify(item));
+	if (itemnew){
+// 		itemnew.name = actor.itemName;
+		const destworld = actor.itemName.match(/[0-9]+$/)[0];
+		itemnew.destworld = destworld;
+		
+		itemnew.world = actor.world;
+		
+		finalitems.push(itemnew);
+		//console.log("found: " + JSON.stringify(itemnew));
+	}else {
+		//console.log(name);
+		
+	}
+	
+});
+const filename = seed+".mwitems.json";
+fs.writeFile(filename, JSON.stringify(finalitems), err => {
+  if (err) {
+    console.error(err);
+  } } );
+const filename2 = seed+".mwactors.json";
+fs.writeFile(filename2, JSON.stringify(data), err => {
+  if (err) {
+    console.error(err);
+  } } );
+
+
+

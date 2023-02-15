@@ -17,7 +17,9 @@
 			"enemy-hp",
 			"100-hearts",
 			"penalty-reduction",
-			"price-rando"
+			"price-rando",
+			"enemizer",
+			"graveyard-duck"
 		]
 	},
 	"hard": {
@@ -25,7 +27,10 @@
 		"description": "Ready for a challenge? No help with your heart grinds. Merchant prices and enemy HP randomized.",
 		"patches": [
 			"enemy-hp",
-			"price-rando"
+			"price-rando",
+			"enemizer",
+			"graveyard-duck"
+			
 		]
 	},
 	"elite": {
@@ -35,7 +40,9 @@
 			"enemy-hp",
 			"price-rando",
 			"disable-qk",
-			"drac-downgrade"
+			"drac-downgrade",
+			"enemizer",
+			"graveyard-duck"
 		]
 	},
 	"diamondWarp": {
@@ -46,7 +53,9 @@
 			"100-hearts",
 			"penalty-reduction",
 			"price-rando",
-			"diamond-warp"
+			"diamond-warp",
+			"enemizer",
+			"graveyard-duck"
 		]
 	}
 }

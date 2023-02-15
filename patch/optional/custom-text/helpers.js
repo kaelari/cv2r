@@ -34,7 +34,7 @@ exports.prepText = function(text, actorName) {
 
 	lines = lines.filter(l => l[0] !== '');
 	if (lines.length > MAX_LINES || (actorName === 'merchant' && lines.length > MAX_MERCHANT_LINES)) {
-		throw new Error(`text is too long: "${text}"`);
+		throw new Error(`text is too long: "${text}" `+ text.length);
 	}
 
 	return lines.reduce((a,c) => a + c.join(' ') + '\n', '').trimEnd();

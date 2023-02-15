@@ -73,11 +73,19 @@ module.exports = {
 				const index = randomInt(rng, 0, newText[textKey].length - 1);
 				const rawText = newText[textKey][index];
 				const item = actor.itemName;
-				const text = _.template(rawText)(itemArticles(item));
+				var text;
+				if (item === "clue"){
+					
+					text = actor.text.replace(/\n/g, " ");
+					
+				}else {
+					text = _.template(rawText)(itemArticles(item));
+				}
 				const mod = modText(pm.name, prepText(text, actor.name), bank[3]);
 				newText[textKey].splice(index, 1);
 
 				if (sharedItemTypes.includes(actor.itemType)) {
+					
 					textValues[actor.itemType] = `
 LDA #$${(mod.ram & 0xFF).toString(16)}
 STA *$00
@@ -85,6 +93,7 @@ LDA #$${(mod.ram >>> 8).toString(16)}
 STA *$01
 `;
 				} else {
+					
 					const pointerIndex = textPointers.findIndex(p => p === romToRam(actor.textPointer));
 					pm.add([mod.ram & 0xFF], BASE_ADDR_ROM + (pointerIndex * 2));
 					pm.add([mod.ram >>> 8], BASE_ADDR_ROM + (pointerIndex * 2) + 1);

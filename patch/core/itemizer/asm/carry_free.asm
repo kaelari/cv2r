@@ -9,7 +9,7 @@ LDA #$8
 BNE DOCODE
 NO_BAG LDA #$4
 DOCODE STA *$D0
-LDA *$<%= memory %>
+LOOP LDA *$<%= memory %>
 CMP *$D0
 BCS C_DONE
 INC *$<%= memory %>
@@ -17,6 +17,7 @@ LDA *$<%= memory %>
 CMP *$D0
 BCS C_DONE
 INC *$<%= memory %>
+BCC LOOP
 
 C_DONE PLP
 LDA *$<%= memory %>

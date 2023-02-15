@@ -48,7 +48,11 @@ ITEM_WRAP.fangs = {
 	prefix: 'the',
 	suffix: 'are'
 };
-
+ITEM_WRAP.clue = {
+	prefix: 'a',
+	suffix: 'is'
+	
+}
 function preWrap(item) {
 	return `${ITEM_WRAP[item].prefix} ${item}`;
 }
@@ -98,14 +102,14 @@ module.exports = {
 				if (isDoorRando) {
 					const sp = global.doorSpoiler.find(s => s[1] === entryRoom || s[1] ===fulllocation );
 					if (!sp) {
-						clues.push(`${fullWrap(item)} for sale in ${location} door`);
+						clues.push(`${fullWrap(item)} for sale in ${location}`);
 						
 					} else {
 						const door = sp[0].substring(0, sp[0].indexOf(' '));
 						clues.push(`Enter a door at ${door} to buy ${item}`);
 					}
 				} else {
-					clues.push(`${fullWrap(item)} for sale in ${location} door`);
+					clues.push(`${fullWrap(item)} for sale in ${location}`);
 				}
 			} else if (actor === 'sacred flame') {
 				clues.push(`${fullWrap(item)} hidden on Dabi's Path`);
@@ -138,7 +142,9 @@ module.exports = {
 		log('----------', true);
 		core.forEach(loc => {
 			if (!loc.actors) { return; }
-			loc.actors.filter(a => a.fixture && a.name === 'book').forEach(a => {
+			
+			loc.actors.filter(a => (a.fixture && a.name === 'book') || (a.itemName == "clue")).forEach(a => {
+				
 				let index = 0;
 				let maxlength = a.text.length;
 				if (maxlength < shortest) {
@@ -146,7 +152,7 @@ module.exports = {
 					maxlength = shortest;
 				}
 				while (clues[index] != null && clues[index].length > maxlength) {
-					log('skipping a clue for lack of space in book', true);
+					
 					index += 1;
 				}
 
@@ -160,6 +166,7 @@ module.exports = {
 				// make sure new text does not exceed the text it is replacing
 				if (clues[index].length > maxlength) {
 					if (clues[index].length > maxlength) {
+						
 						clues[index] = clues[index].slice(0, maxlength - 1);
 					}
 				}
@@ -170,10 +177,35 @@ module.exports = {
 
 				const textBytes = textToBytes(clues[index]);
 				pm.add(textBytes, a.textPointer);
-				
+				a.text = clues[index];
 				// delete so we don't give the same clue twice
 				clues.splice(index, 1);
+				shortest = 1000;
+				for (let i = 0; i < clues.length; i++) {
+					shortest = clues[i].length < shortest ? clues[i].length : shortest;
+					
+				}
 			});
 		});
+// 		var i=0;
+// 		core.forEach(loc => {
+// 			if (!loc.actors) { return; }
+// 			loc.actors.forEach(actor => {	
+// 				if (!actor.textPointer) { return; }
+// 				const item = actor.itemName;
+// 				if (item === "clue"){
+// 					
+// 					const text = clues[i];
+// 					const textBytes = textToBytes(clues[i]);
+// 					pm.add(textBytes, actor.textPointer);
+// 					actor.text = text;
+// 					i++;
+// 				}
+// 				
+// 			});
+// 		});
+		
+		
+		
 	}
 };

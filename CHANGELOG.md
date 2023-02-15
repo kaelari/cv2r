@@ -1,5 +1,31 @@
 # CHANGELOG
 
+## 1.8.5 - KAELARI
+* fixed a bug with whips and multiworld
+
+## 1.8.4 - KAELARI 10/27/22
+* Fixed an issue where wrong warp in rover could crash the game if a specific enemy rolled into a spider.
+* Fixed an issue with prices when price-rando is off (they were not being converted to hex properly)
+	(reverted due to it changing prices when price-rando is on)
+* Support for clues to replace a non-merchant checks. This would require removing some other check to make room.
+* Adjusted command line to display required patches
+* Adjusted difficulties for command line to include enemizer and graveyard-duck
+* Laurels and garlic will now fill if you get them from a free check
+* Multiworld generator
+
+## 1.8.3 - KAELARI  10/14/22
+* minor bug fixes
+
+## 1.8.2 - KAELARI
+* Beginner Mode Support
+* Moved enemizer and Graveyard Duck to optional
+* Patches can now require othe patches. This doesn't do anything other than display text on the website.
+
+## 1.8.1 - KAELARI
+* Added town rando
+* Added support for custom logic modifiers
+
+
 ## 1.8.0 - 2022-01-29
 
 * Added Simon's life count to the start menu

@@ -2,7 +2,7 @@
 
 const _ = require('lodash');
 const { cyan, gray, green, red, yellow } = require('chalk');
-const { exec } = require('child_process');
+const { spawn, exec, spawnSync } = require('child_process');
 const camelcase = require('camelcase');
 const cv2r = require('../lib/cv2r');
 const difficulty = require('../config/difficulty');
@@ -36,6 +36,9 @@ program
 	.option('-y, --show-spoilers', 'show spoilers in debug logging (must use with --debug)')
 	.option('-z, --debug', 'enable debug output')
 	.option('-c, --customjson <path>', 'Use a custom jsonfile')
+	.option('-m, --multiworld <number>', 'create a multiworld')
+	.option('-w, --world <number>', 'specify which world this is for multiworld')
+	
 	.option('--dev-force-enemy <devForceEnemy>', 'Spawn only one type of enemy, specified as "enemyId:tableId". For example, spawning only harpies would be "--dev-force-enemy 0x3B:0x7". Values for enemy and table id can be found in lib/object.js.');
 
 program
@@ -143,8 +146,11 @@ program.outputHelp = function () {
 	console.log(cyan('Patches'));
 	console.log('');
 	pm.getPatches().forEach(patch => {
-		const description = p(patch.short || patch.description);
+		var description = p(patch.short || patch.description);
 		process.stdout.write(`  * ${p(patch.id)}`);
+		if (patch.requires){
+			description+= green("\nRequires: "+patch.requires);
+		}
 		desc(description);
 		console.log('');
 	});
@@ -225,19 +231,59 @@ async function main() {
 
 		printHeader('options');
 		const opts = _.pick(program, program.options.map(o => camelcase(o.long)).concat('rom'));
+		//make multiworld data if it's been selected
+		
+		if (program.multiworld && !program.world){
+			program.world = 1;
+			var path = require('path');
+			const filepath =path.join(__dirname, '..', 'tools/');
+			var foo = spawnSync('node', [filepath+'mw_actual.js', opts.multiworld, opts.seed
+			]);
+			
+		}
+		if (program.world){
+		
+			program.worlddata = require("./"+opts.seed+".mwitems.json");
+			program.worlddataactors = require("./"+opts.seed+".mwactors.json");
+		}
+		
 		opts.version = program.version();
 		log(opts);
 		log('');
 
 		// create the rando based on command line options and config.json
 		const outputLog = msg => !opts.json && console.log(msg);
+		
+		
+		
+		
 		const output = await cv2r(program);
+		
 		outputLog(`CV2 Randomizer ${green('successful!')}`);
 		outputLog(`* rom:          ${cyan(output.rom)}`);
 		outputLog(`* patch:        ${cyan(output.patch)}`);
 		outputLog(`* item spoiler: ${cyan(output.spoiler)}`);
 		outputLog(`* door spoiler: ${cyan(output.doorSpoiler)}`);
-
+		if (opts.multiworld) {
+			var world;
+			if (!opts.world) {
+				//console.log(program);
+				world =2;
+				opts.world=1;
+			}else {
+				world = parseInt(opts.world) +1;
+			}
+			if (world <= opts.multiworld){
+				
+				command = program.rawArgs.shift();
+				program.rawArgs.push('--world');
+				program.rawArgs.push(world);
+				
+				
+				prog = spawn(command, program.rawArgs, { stdio: 'inherit' });
+				
+			}
+		}
 		// run the rom, if necessary
 		if (program.run) {
 			const cmd = os.platform() === 'darwin' ?
