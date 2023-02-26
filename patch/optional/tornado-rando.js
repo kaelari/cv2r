@@ -6,7 +6,7 @@ const { log } = require('../../lib/utils');
 
 
 module.exports = {
-	pre: true,
+	pre: false,
 	order:10,
 	id: 'tornado-rando',
 	name: 'Tornado Randomizer',

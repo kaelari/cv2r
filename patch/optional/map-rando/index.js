@@ -9,6 +9,7 @@ const leftcap = {
 		height: 1,
 		heightoffset: 0xAEB9,
 		name: 'Jam Wasteland (Deborah Cliff)',
+		mustbeleft: true,
 	},
 	vrad: {
 		height: 1,
@@ -59,8 +60,11 @@ const areas = {
 			leftoffset: 0xB3B7,
 			minlength: 0,
 			maxlength: 2,
-			height: 2
-			
+			height: 2,
+			objset: 3,
+			area: 2,
+			onlyheight1: true,
+			fcrequired: true,
 		}
 	},
 	alba: {
@@ -91,7 +95,8 @@ const areas = {
 				glitch: 'HEART',
 				diamondWarp: 'HEART'
 			},
-		}
+		},
+		mustbeleft: true,
 	},
 	jova: {
 		leftoffset: 0x1FA12, 
@@ -101,6 +106,7 @@ const areas = {
 		objset: 0,
 		area: 0,
 		name: 'Jova',
+		nobranch: true,
 		
 	},
 	jovawoods: {
@@ -153,7 +159,7 @@ const areas = {
 		leftoffset:0xA6C9,
 		rightoffset: 0xA6CC,
 		height: 1,
-		heightoffset: 0xA6F3,
+		//heightoffset: 0xA6F3,
 		objset: 2,
 		area: 4,
 	},
@@ -176,6 +182,7 @@ const areas = {
 			area: 3,
 			minlength: 1,
 			maxlength: 2,
+			onlyheight1: true,
 		}
 	},
 	aljibawoods: {
@@ -226,10 +233,11 @@ const areas = {
 		height: 1,
 		leftoffset: 0x1FAE0,
 		rightoffset: 0x1FAE3,
-		heightoffset: 0x80E2,
+		//heightoffset: 0x80E2,
 		objset: 0,
 		area: 5,
-
+		name: "Doina",
+		
 	},
 	yomi: {
 		height: 1,
@@ -240,13 +248,30 @@ const areas = {
 		area: 6,
 		
 	},
+	veros:  {
+		height: 1,
+		objset: 0,
+		area: 1,
+		leftoffset: 0x866A,
+		rightoffset: 0x866D,
+		name: 'Veros',
+	},
+	debiouswoods: {
+		leftoffset:0xB7DA,
+		rightoffset: 0xB7DD,
+		objset: 3,
+		area: 3,
+		height: 1,
+		addrequires: "(BLUE_CRYSTAL && WHITE_CRYSTAL && (HOLY_WATER || NAIL) && LAURELS)",
+		
+		name: 'Debious Woods - Part 3'
+	},
 	bridgeofdoom: {
 		height: 1,
 		leftoffset: 0xA192,
 		rightoffset: 0xA195,
-		heightoffset: 0xA1C9,
+		//heightoffset: 0xA1C9,  //also used elsewhere. yes grrr
 		objset: 2,
-		
 		area: 8,
 		rightbranch: {
 			rightoffset: 0xA1BD,
@@ -255,7 +280,7 @@ const areas = {
 			area: 8,
 			minlength: 1,
 			maxlength: 2,
-			mustbeheight1: true,
+			onlyheight1: true,
 		},
 	}
 	
@@ -297,6 +322,7 @@ var rightcap = {
 			
 		}
 }
+
 module.exports = {
 	pre: true,
 	order:1,
@@ -313,241 +339,313 @@ module.exports = {
 		
 		var last;
 		shuffleArray(keys, rng);
+		
 		var leftcaps = Object.keys(leftcap);
 		shuffleArray(leftcaps, rng);
-		last = leftcap[leftcaps[0]];
+		console.log(leftcaps);
 		var rightcaps = Object.keys(rightcap);
 		shuffleArray(rightcaps, rng);
-		console.log("starting leftcap" +leftcaps[0]); 
-		leftcaps.splice(0, 1);
+		//console.log("starting leftcap" +leftcaps[0]); 
 		sizeofleft= randomInt(rng, 5, 10);
-		console.log(keys.indexOf("jova"));
-		if (keys.indexOf("jova") > 5 ) {
-			keys.splice(5, 0, keys.splice(keys.indexOf("jova"), 1)[0]);	
-			console.log("jova moved to front");
+		//console.log(keys.indexOf("jova"));
+		if (keys.indexOf("jova") > sizeofleft ) {
+			const position = randomInt(rng, 1, sizeofleft-2);
+			keys.splice(position, 0, keys.splice(keys.indexOf("jova"), 1)[0]);	
+			
 		}
 		
+		//debious woods always goes first so it's in the first left branch
+		keys.splice(0, 0, keys.splice(keys.indexOf("debiouswoods"), 1)[0]);	
 		
-		while (keys.length>0 && sizeofleft > 0) {
-			pm.add([0xFF, areas[keys[0]].objset,areas[keys[0]].area ], last.rightoffset);
-			pm.add([0xFF, last.objset, last.area ], areas[keys[0]].leftoffset);
-			if (last.name){
-				updatelogic(last.name, logic, '');
-			}
-			var height = last.height;
-			if (last.rightheight != null ){
-				height = last.rightheight;
-				
-			}
-			adjustheight(last.heightoffset, height, areas[keys[0]].height, pm);
-			
-			
-			last = areas[keys[0]];
-			console.log("going to "+keys[0]);
-			keys.splice(0, 1);
-			if (last.rightbranch){ 
-				
-				var screens = randomInt(rng, last.rightbranch.minlength, last.rightbranch.maxlength);
-				
-				var i = 0;
-				
-				last2 = last;
-				while (screens > 0 && keys[i] ){
-					if (areas[keys[i]].rightbranch || areas[keys[i]].throughbranch ||areas[keys[i]].branch){
-						i++;
-						continue;
-					}
-					
-					if (last2.rightbranch){
-						if (last2.rightbranch.mustbeheight1 && areas[keys[i]].height > 1){
-							i++;
-							continue;
-						}
-						pm.add([0xFF, areas[keys[i]].objset, areas[keys[i]].area ], last2.rightbranch.rightoffset);
-						if (last2.rightbranch.usefc){
-							pm.add([0xFC, last2.rightbranch.objset,last2.rightbranch.area ], areas[keys[i]].leftoffset);
-						}else {
-							pm.add([0xFF, last2.rightbranch.objset,last2.rightbranch.area ], areas[keys[i]].leftoffset);
-						}
-					}else {
-						pm.add([0xFF, last2.objset,last2.area ], areas[keys[i]].leftoffset);
-						pm.add([0xFF, areas[keys[i]].objset, areas[keys[i]].area ], last2.rightoffset);
-					}
-					
-					var height = last2.height;
-					if (last2.branch){ 
-						height = last2.branch.height;
-					
-					}
-					
-					
-					adjustheight(areas[keys[i]].heightoffset, height, areas[keys[i]].height, pm);
-					
-					last2 = areas[keys[i]];
-					keys.splice(i, 1);
-					screens--;
-
-				}
-				
-				//then we put a rightcap on in it
-				var right = rightcap[rightcaps[0]];
-				
-				rightcaps.splice(0, 1);
-				
-				
-				if (last2.rightbranch){
-					pm.add([0xFF, right.objset, right.area ], last2.rightbranch.rightoffset);
-					if (last2.rightbranch.usefc){
-							pm.add([0xFC, last2.rightbranch.objset,last2.rightbranch.area ], right.leftoffset);
-						}else {
-							pm.add([0xFF, last2.rightbranch.objset,last2.rightbranch.area ], right.leftoffset);
-						}
-				}else {
-					pm.add([0xFF, last2.objset,last2.area ], right.leftoffset);
-					pm.add([0xFF, right.objset, right.area ], last2.rightoffset);	
-				}
-				var height = last2.height;
-				if (last2.rightbranch){ 
-					height = last2.rightbranch.height;
-					
-				}
-				adjustheight(last2.heightoffset, height, right.height, pm);
-				if (last2.name){
-						updatelogic(last2.name, logic, branchreqs);
-					}
-					
-				if (right.name){
-					if (right.requirements){
-						updatelogic(right.name, logic, right.requirements[logic]);
-					}
-					
-				}
-				
-			}
-			if (last.throughbranch){
-				//this is veros underground we go and connect to the that tile with some number of random tiles
-				var branchreqs = '';
-				if (last.throughbranch.requirements){
-					branchreqs = last.throughbranch.requirements[logic];
-				}
-				
-				var screens = randomInt(rng, last.throughbranch.minlength, last.throughbranch.maxlength);
-				
-				var i = 0;
-				
-				last2 = last;
-				while (screens > 0 && keys[i] ){
-					if (areas[keys[i]].branch || areas[keys[i]].height != 1){
-						i++;
-						continue;
-					}
-					
-					if (last2.throughbranch){
-						pm.add([0xFF, areas[keys[i]].objset, areas[keys[i]].area ], last2.throughbranch.rightoffset);
-						pm.add([0xFC, last2.objset,last2.area ], areas[keys[i]].leftoffset);
-					}else {
-						pm.add([0xFF, areas[keys[i]].objset, areas[keys[i]].area ], last2.rightoffset);
-						pm.add([0xFF, last2.objset,last2.area ], areas[keys[i]].leftoffset);
-					}
-										
-					
-					if (last2.name){
-						updatelogic(last2.name, logic, branchreqs);
-					}
-					last2 = areas[keys[i]];
-					keys.splice(i, 1);
-					screens--;
-
-				}
-				
-				pm.add([0xFC, last.throughbranch.objset, last.throughbranch.area ], last2.rightoffset);
-				pm.add([0xFF, last2.objset, last2.area ], last.throughbranch.leftoffset);
-				
-				
-				
-				
-			}
-			if (last.branch){
+		branches = keys.filter(a => areas[a].branch != null);
+		//console.log(branches);
+		j=0;
+		console.log(keys);
+		while (j< branches.length){
 				//we go the other way through a branch and connect to a leftcap
 				//or we start from a new leftcap and go to this cap
 				var branchreqs = '';
-				if (last.branch.requirements){
-					branchreqs = last.branch.requirements[logic];
+				if (areas[branches[j]].branch.requirements){
+					branchreqs = areas[branches[j]].branch.requirements[logic];
 				}
-				
-				var screens = randomInt(rng, last.branch.minlength, last.branch.maxlength);
-				
+				console.log("creating array for " + branches[j]);
+				areas[branches[j]].contains = [];
+				var screens = randomInt(rng, areas[branches[j]].branch.minlength, areas[branches[j]].branch.maxlength);
 				var i = 0;
 				
-				last2 = last;
+				last2 = areas[branches[j]];
+				
 				while (screens > 0 && keys[i] ){
-					if (areas[keys[i]].branch || areas[keys[i]].throughbranch || areas[keys[i]].rightbranch ){
+					if (areas[keys[i]].branch || areas[keys[i]].throughbranch || areas[keys[i]].rightbranch || areas[keys[i]].nobranch ){
 						i++;
 						continue;
 					}
 					
+					if ((last2.height >1 && areas[keys[i]].heightoffset == null)){
+						i++;
+						continue;
+						
+					}
+					if (areas[keys[i]].name){
+						areas[branches[j]].contains.push(areas[keys[i]].name);
+					}
+					if (areas[keys[i]].addrequires){
+						if (branchreqs){
+							branchreqs = "( "+branchreqs+") && ("+areas[keys[i]].addrequires+")";
+						}else {
+							branchreqs = areas[keys[i]].addrequires;
+							
+						}
+						
+					}
+					var rightfc = false;
 					if (last2.branch){
-						pm.add([0xFF, areas[keys[i]].objset, areas[keys[i]].area ], last2.branch.leftoffset);
-						pm.add([0xFF, last2.branch.objset,last2.branch.area ], areas[keys[i]].rightoffset);
+						
+						if (last2.branch.onlyheight1){
+							if (areas[keys[i]].height > 1){
+								i++;
+								continue;
+							}
+							rightfc= true;
+							
+						}
+						attach(areas[keys[i]],last2,  {leftbranch: true, rightfc: rightfc}, pm);
+					}	else {
+						attach( areas[keys[i]],last2, {}, pm);
+					}
+					if (last2.name){
+						console.log("updating "+last2.name+" with "+branchreqs);
+						updatelogic(last2.name, logic, branchreqs);
+					}
+					last2 = areas[keys[i]];
+					
+					keys.splice(i, 1);
+					screens--;
+					
+				}
+				//throw a cap on it
+				
+			var left = leftcap[leftcaps[0]];
+			leftcaps.splice(0, 1);
+			if (last2.branch){
+				attach(left, last2, {leftbranch:true, rightfc: true}, pm);		
+			}else {
+				attach(left, last2, {}, pm);		
+			}
+			if (last2.name){
+				updatelogic(last2.name, logic, branchreqs);
+				
+			}
+			if (left.name){
+				console.log(branches[j]+ " contains now " +left.name);
+				updatelogic(left.name, logic, branchreqs);
+				areas[branches[j]].contains.push(left.name);
+				console.log(areas[branches[j]]);
+			}
+			if (left.mustbeleft){
+				areas[branches[j]].mustbeleft = true;
+				console.log("must be left!");
+				console.log(left);
+				console.log(areas[branches[j]]);
+			}else {
+				console.log("doesn't need to be left "+ j);
+				console.log(left);
+				
+			}
+			j++;
+		}
+		branches = keys.filter(a => areas[a].throughbranch != null);
+		//console.log(branches);
+		j=0;
+		while (j< branches.length){
+				//we go the other way through a branch and connect to a leftcap
+				//or we start from a new leftcap and go to this cap
+				
+				var screens = randomInt(rng, areas[branches[j]].throughbranch.minlength, areas[branches[j]].throughbranch.maxlength);
+				var i = 0;
+				
+				last2 = areas[branches[j]];
+				areas[branches[j]].contains = [];
+				
+				while (screens > 0 && keys[i] ){
+					if (areas[keys[i]].branch || areas[keys[i]].throughbranch || areas[keys[i]].rightbranch || areas[keys[i]].nobranch ){
+						i++;
+						continue;
+					}
+					if (areas[keys[i]].height > 1){
+						i++;
+						continue;
+					}
+					if (!areas[keys[i]].heightoffset && screens ==1) {
+						i++;
+						continue;
+					}
+					if (!last2.heightoffset && areas[keys[i]].height > 1 ){
+						i++;
+						continue;
+					}
+					if (last2.name){
+						areas[branches[j]].contains.push(last2.name);
+					}
+					var leftfc = false;
+					if (last2.throughbranch){
+						leftfc= true;
+						attach(last2, areas[keys[i]],  {throughbranch: true, leftfc: leftfc}, pm);
+					}	else {
+						attach( last2, areas[keys[i]], {}, pm);
+					}
+					
+					last2 = areas[keys[i]];
+					
+					keys.splice(i, 1);
+					screens--;
+					
+				}
+				//throw a cap on it
+				throughcap = areas[branches[j]];
+				pm.add([0xFC, throughcap.throughbranch.objset, throughcap.throughbranch.area ], last2.rightoffset);
+				pm.add([0xFF, last2.objset, last2.area ], throughcap.throughbranch.leftoffset)
+			
+			
+			j++;
+		}
+		branches = keys.filter(a => areas[a].rightbranch != null);
+		//console.log(branches);
+		j=0;
+		while (j< branches.length){
+				//we go the other way through a branch and connect to a leftcap
+				//or we start from a new leftcap and go to this cap
+				var branchreqs = '';
+				if (areas[branches[j]].rightbranch.requirements){
+					branchreqs = areas[branches[j]].rightbranch.requirements[logic];
+				}
+				areas[branches[j]].contains = [];
+				
+				var screens = randomInt(rng, areas[branches[j]].rightbranch.minlength, areas[branches[j]].rightbranch.maxlength);
+				var i = 0;
+				
+				last2 = areas[branches[j]];
+				
+				while (screens > 0 && keys[i] ){
+					if (areas[keys[i]].branch || areas[keys[i]].throughbranch || areas[keys[i]].rightbranch || areas[keys[i]].nobranch ){
+						i++;
+						continue;
+					}
+					
+					var leftfc = false;
+					if (!last2.heightoffset && areas[keys[i]].height > 1) {
+						i++;
+						continue;
+					}
+					if (areas[keys[i]].name){
+						areas[branches[j]].contains.push(areas[keys[i]].name);
+					}
+					
+					if (last2.rightbranch){
+						
+						if (last2.rightbranch.onlyheight1){
+							if (areas[keys[i]].height > 1){
+								i++;
+								continue;
+							}
+							leftfc= true;
+							
+						}
+						attach(last2, areas[keys[i]],  {rightbranch: true, leftfc: leftfc}, pm);
 					}else {
-						pm.add([0xFF, last2.objset,last2.area ], areas[keys[i]].rightoffset);
-						pm.add([0xFF, areas[keys[i]].objset, areas[keys[i]].area ], last2.leftoffset);
+						attach( last2, areas[keys[i]], {}, pm);
 					}
-					
-					var height = last2.height;
-					if (last2.branch){ 
-						height = last2.branch.height;
-					
-					}
-					
-					
-					adjustheight(areas[keys[i]].heightoffset, areas[keys[i]].height, height, pm);
-					
-					
 					if (last2.name){
 						updatelogic(last2.name, logic, branchreqs);
 					}
 					last2 = areas[keys[i]];
+					
 					keys.splice(i, 1);
 					screens--;
-
+					
 				}
+				//throw a cap on it
+			var right = rightcap[rightcaps[0]];
+			rightcaps.splice(0, 1);
+			attach(last2, right, {}, pm);		
+			if (last2.name){
+				updatelogic(last2.name, logic, branchreqs);
+			}
+			if (right.name){
+				if (right.requirements && branchreqs){
+					updatelogic(right.name, logic, right.requirements[logic]+" && "+branchreqs);	
+				}else if (right.requirements){
 				
-				//then we put a leftcap on in it
-				var left = leftcap[leftcaps[0]];
-				
-				leftcaps.splice(0, 1);
-				
-				pm.add([0xFF, last2.objset,last2.area ], left.rightoffset);
-				if (last2.branch){
-					pm.add([0xFF, left.objset, left.area ], last2.branch.leftoffset);
+					updatelogic(right.name, logic, right.requirements[logic]);	
+				}else if (branchreqs) {
+					updatelogic(right.name, logic, right.branchreqs);	
 				}else {
+					updatelogic(right.name, logic, "");	
+				}
 				
-					pm.add([0xFF, left.objset, left.area ], last2.leftoffset);	
+				areas[branches[j]].contains.push(right.name);
+			
+			}
+
+			j++;
+		}
+		
+		
+		leftareas= keys.filter(a=> areas[a].mustbeleft == true);
+		z = 0;
+		console.log(leftareas);
+		while (leftareas.length > z){
+			const position = randomInt(rng, 0, sizeofleft-1);
+			keys.splice(position, 0, keys.splice(keys.indexOf(leftareas[z]), 1)[0]);	
+			console.log(leftareas[z] + " must be left now "+position);
+			z++;
+		}
+		
+		
+		last = leftcap[leftcaps[0]];
+		leftcaps.splice(0, 1);
+		
+		
+		while (keys.length>0 && sizeofleft > 0) {
+			
+			if (!last.heightoffset && areas[keys[0]].height > 1){
+				//we need to adjust so we don't put this tile here
+				//console.log("We're trying to put a non height 1 next to a height non-adjustable!"+ keys[0]);
+				var i = 1;
+				while (areas[keys[i]].height > 1){
+					i+=1;
 				}
-				var height = last2.height;
-				if (last2.branch){ 
-					height = last2.branch.height;
-					
-				}
-				adjustheight(left.heightoffset, left.height, height, pm);
-				if (last2.name){
-						updatelogic(last2.name, logic, branchreqs);
-					}
-				if (left.name){
-					updatelogic(left.name, logic, branchreqs);
-					
-				}
+				
+				keys.splice(0, 0, keys.splice(i, 1)[0]);	
+				
+				
 			}
 			
 			
+			attach(last, areas[keys[0]], {}, pm);
+			
+			if (last.name){
+				
+				updatelogic(last.name, logic, '');
+				
+			}
+			if (last.contains){
+				console.log("this is a branch " +last.name);
+				console.log(last.contains);
+			}
+			last = areas[keys[0]];
+			console.log(keys[0]);
+			keys.splice(0, 1);
 			
 			sizeofleft -=1;
 		}
 		
 		pm.add([0xFF, midcap.objset, midcap.area ], last.rightoffset);
 		pm.add([0xFF, last.objset, last.area ], midcap.leftoffset);
+		if (last.name){
 		
+			updatelogic(last.name, logic, '');
+		}
 		if (midcap.name){
 			updatelogic(midcap.name, logic, '');
 		}
@@ -563,247 +661,41 @@ module.exports = {
 			
 		}
 		last = midcap;
-		console.log("part b "+keys[0]);
+		console.log("part b, post tornado");
 		while (keys.length>0) {
-			
-			pm.add([0xFF, areas[keys[0]].objset,areas[keys[0]].area ], last.rightoffset);
-			pm.add([0xFF, last.objset, last.area ], areas[keys[0]].leftoffset);
+			console.log(keys[0]);
+			if (!last.heightoffset && areas[keys[0]].height > 1){
+				//we need to adjust so we don't put this tile here
+				//console.log("We're trying to put a non height 1 next to a height non-adjustable!"+ keys[0]);
+				var i = 1;
+				while (areas[keys[i]].height > 1){
+					i+=1;
+				}
+				
+				keys.splice(0, 0, keys.splice(i, 1)[0]);	
+				
+				
+			}
+			attach(last, areas[keys[0]], {}, pm);
 			if (last.name){
 				updatelogic(last.name, logic, requirements);
 			}
-			var height = last.height;
-			if (last.rightheight != null ){
-				height = last.rightheight;
+			if (last.branch){
+				console.log("this is a branch");
 				
 			}
-			adjustheight(last.heightoffset, height, areas[keys[0]].height, pm);
+			if (last.contains){
+				console.log("branch");
+				console.log(last);
+				for (i=0; i< last.contains.length; i++) {
+					updatelogic(last.contains[i], logic, requirements);
+				}
+			}
 			
 			
 			last = areas[keys[0]];
-			console.log("going to " + keys[0]);
+			console.log(keys[0]);
 			keys.splice(0, 1);
-			if (last.rightbranch){ 
-				
-				var screens = randomInt(rng, last.rightbranch.minlength, last.rightbranch.maxlength);
-				
-				var i = 0;
-				
-				last2 = last;
-				while (screens > 0 && keys[i] ){
-					if (areas[keys[i]].rightbranch || areas[keys[i]].throughbranch ||areas[keys[i]].branch){
-						i++;
-						continue;
-					}
-					
-					if (last2.rightbranch){
-						if (last2.rightbranch.mustbeheight1 && areas[keys[i]].height > 1){
-							i++;
-							continue;
-						}
-						pm.add([0xFF, areas[keys[i]].objset, areas[keys[i]].area ], last2.rightbranch.rightoffset);
-						
-						if (last2.rightbranch.usefc){
-							pm.add([0xFC, last2.rightbranch.objset,last2.rightbranch.area ], areas[keys[i]].leftoffset);
-							
-						}else {
-							pm.add([0xFF, last2.rightbranch.objset,last2.rightbranch.area ], areas[keys[i]].leftoffset);
-						}
-					}else {
-						pm.add([0xFF, last2.objset,last2.area ], areas[keys[i]].leftoffset);
-						pm.add([0xFF, areas[keys[i]].objset, areas[keys[i]].area ], last2.rightoffset);
-					}
-					
-					var height = last2.height;
-					if (last2.rightbranch){ 
-						height = last2.rightbranch.height;
-					
-					}
-					
-					
-					adjustheight(areas[keys[i]].heightoffset, height, areas[keys[i]].height, pm);
-					if (last2.name){
-						updatelogic(last2.name, logic, requirements);
-					}
-					last2 = areas[keys[i]];
-					keys.splice(i, 1);
-					screens--;
-
-				}
-				
-				//then we put a rightcap on in it
-				var right = rightcap[rightcaps[0]];
-				
-				rightcaps.splice(0, 1);
-				
-				
-				if (last2.rightbranch){
-					pm.add([0xFF, right.objset, right.area ], last2.rightbranch.rightoffset);
-					if (last2.rightbranch.usefc){
-						pm.add([0xFC, last2.objset,last2.area ], right.leftoffset);	
-					}
-				}else {
-					pm.add([0xFF, last2.objset,last2.area ], right.leftoffset);
-					pm.add([0xFF, right.objset, right.area ], last2.rightoffset);	
-				}
-				var height = last2.height;
-				if (last2.rightbranch){ 
-					height = last2.rightbranch.height;
-					
-				}
-				adjustheight(last2.heightoffset, height, right.height, pm);
-				if (last2.name){
-						updatelogic(last2.name, logic, requirements);
-					}
-					
-				if (right.name){
-					if (right.requirements){
-						
-						updatelogic(right.name, logic, requirements+ "&& "+right.requirements[logic]);
-					}else {
-					
-						updatelogic(right.name, logic, requirements);
-					}
-					
-				}
-				
-			}
-			if (last.throughbranch){
-				//this is veros underground we go and connect to the that tile with some number of random tiles
-// 				var branchreqs = '';
-				if (last.throughbranch.requirements){
-					branchreqs = last.throughbranch.requirements[logic];
-				}
-				
-					
-				var screens = randomInt(rng, last.throughbranch.minlength, last.throughbranch.maxlength);
-				
-				var i = 0;
-				
-				last2 = last;
-				while (screens > 0 && keys[i] ){
-					if (areas[keys[i]].branch || areas[keys[i]].height != 1){
-						i++;
-						continue;
-					}
-					if (areas[keys[i]].rightbranch || areas[keys[i]].throughbranch || areas[keys[i]].branch){
-						i++;
-						continue;
-					}
-					if (last2.throughbranch){
-						pm.add([0xFF, areas[keys[i]].objset, areas[keys[i]].area ], last2.throughbranch.rightoffset);
-						pm.add([0xFC, last2.objset,last2.area ], areas[keys[i]].leftoffset);
-					}else {
-						pm.add([0xFF, areas[keys[i]].objset, areas[keys[i]].area ], last2.rightoffset);
-						pm.add([0xFF, last2.objset,last2.area ], areas[keys[i]].leftoffset);
-					}
-										
-					
-					if (last2.name){
-						updatelogic(last2.name, logic, requirements);
-					}
-					last2 = areas[keys[i]];
-					keys.splice(i, 1);
-					screens--;
-
-				}
-				
-				pm.add([0xFC, last.throughbranch.objset, last.throughbranch.area ], last2.rightoffset);
-				pm.add([0xFF, last2.objset, last2.area ], last.throughbranch.leftoffset);
-				
-				
-				
-				
-			}
-			if (last.branch){
-				//we go the other way through a branch and connect to a leftcap
-				//or we start from a new leftcap and go to this cap
-				var branchreqs = '';
-				if (last.branch.requirements){
-					branchreqs = last.branch.requirements[logic];
-				}
-				
-				var screens = randomInt(rng, last.branch.minlength, last.branch.maxlength);
-				
-				var i = 0;
-				
-				last2 = last;
-				while (screens > 0 && keys[i] ){
-					if (areas[keys[i]].branch || areas[keys[i]].throughbranch || areas[keys[i]].rightbranch){
-						i++;
-						continue;
-					}
-					
-					if (last2.branch){
-						pm.add([0xFF, areas[keys[i]].objset, areas[keys[i]].area ], last2.branch.leftoffset);
-						pm.add([0xFF, last2.branch.objset,last2.branch.area ], areas[keys[i]].rightoffset);
-					}else {
-						pm.add([0xFF, last2.objset,last2.area ], areas[keys[i]].rightoffset);
-						pm.add([0xFF, areas[keys[i]].objset, areas[keys[i]].area ], last2.leftoffset);
-					}
-					
-					var height = last2.height;
-					if (last2.branch){ 
-						height = last2.branch.height;
-					
-					}
-					
-					
-					adjustheight(areas[keys[i]].heightoffset, areas[keys[i]].height, height, pm);
-					
-					
-					if (last2.name){
-						if (branchreqs && requirements){
-							updatelogic(last2.name, logic, "("+requirements+") && ("+branchreqs+")");
-						}else if (branchreqs){
-						
-							updatelogic(last2.name, logic, branchreqs);
-						}
-						else if (requirements){
-							updatelogic(last2.name, logic, requirements);
-							
-						}
-					}
-					last2 = areas[keys[i]];
-					keys.splice(i, 1);
-					screens--;
-
-				}
-				
-				//then we put a leftcap on in it
-				var left = leftcap[leftcaps[0]];
-				
-				leftcaps.splice(0, 1);
-				
-				pm.add([0xFF, last2.objset,last2.area ], left.rightoffset);
-				if (last2.branch){
-					pm.add([0xFF, left.objset, left.area ], last2.branch.leftoffset);
-				}else {
-				
-					pm.add([0xFF, left.objset, left.area ], last2.leftoffset);	
-				}
-				var height = last2.height;
-				if (last2.branch){ 
-					height = last2.branch.height;
-					
-				}
-				adjustheight(left.heightoffset, left.height, height, pm);
-				if (last2.name){
-						if (branchreqs && requirements) {
-							updatelogic(last2.name, logic, "("+requirements+") && ("+branchreqs+")");
-						}else if (requirements){ 
-							updatelogic(last2.name, logic, requirements);
-						}else if (branchreqs) {
-							updatelogic(last2.name, logic, branchreqs);
-							
-						}
-					}
-				if (left.name){
-					updatelogic(left.name, logic, branchreqs);
-					
-				}
-			}
-			//then we put a rightcap on in it
-				
 
 		}
 		
@@ -827,7 +719,12 @@ module.exports = {
 				if (last.name){
 					updatelogic(last.name, logic, requirements);
 				}
-					
+				if (last.contains) {
+					console.log(last);
+					for (i=0; i< last.contains.length; i++) {
+						updatelogic(last.contains[i], logic, requirements);
+					}
+				}
 				if (right.name){
 					if (right.requirements){
 						updatelogic(right.name, logic, right.requirements[logic]);
@@ -843,16 +740,65 @@ module.exports = {
 		pm.add(tornadovalue, tornadooffset);
 		pm.add(tornadodestobjset, 0x1d092);
 		
-		updatelogic('Debious Woods - Part 3', logic, "(RED_CRYSTAL && BLUE_CRYSTAL && WHITE_CRYSTAL && HEART && NAIL && RIB && RING && MAGIC_CROSS && GARLIC && HOLY_WATER)");
+		//updatelogic('Debious Woods - Part 3', logic, "(RED_CRYSTAL && BLUE_CRYSTAL && WHITE_CRYSTAL && HEART && NAIL && RIB && RING && MAGIC_CROSS && EYEBALL && GARLIC && HOLY_WATER)");
 	}
 	
 }
 
-
+function attach (left, right, options, pm){
+	var lefttype= 0xff;
+	var righttype = 0xff;
+	if (options.leftfc) {
+		lefttype= 0xfc;
+		
+	}
+	if (options.rightfc){
+		righttype = 0xfc;
+		
+	}
+	
+	
+	
+	if (options.leftbranch) {
+		pm.add([lefttype, left.objset, left.area ], right.branch.leftoffset);
+		pm.add([righttype, right.branch.objset, right.branch.area ], left.rightoffset);
+	}else if (options.throughbranch) {
+		
+		pm.add([lefttype, left.objset, left.area ], right.leftoffset);
+		pm.add([righttype, right.objset, right.area ], left.throughbranch.rightoffset);
+		
+	}else if (options.rightbranch){
+		
+		pm.add([lefttype, left.rightbranch.objset, left.rightbranch.area ], right.leftoffset);
+		pm.add([righttype, right.objset, right.area ], left.rightbranch.rightoffset);
+		
+	}else {
+		pm.add([lefttype, right.objset, right.area ], left.rightoffset);
+		pm.add([righttype, left.objset, left.area ], right.leftoffset);
+	}
+		
+	
+	
+	if (options.noheightchange || left.heightoffset == null){
+		
+	}else {
+		adjustheight(left.heightoffset, left.height, right.height, pm);
+	}
+	
+	
+}
 
 
 function adjustheight(heightoffset, height1, height2, pm) {
-		
+		if (!heightoffset) {
+			console.log("no heightoffset! Probably a problem");
+			if (height1 != height2){
+				console.log("height problem for sure");
+				
+			}
+			return;
+		}
+		var value=0;
 		if (height1 != height2){
 					if (height1 > height2) {
 						value = 256 - (height1 - height2);
@@ -860,14 +806,12 @@ function adjustheight(heightoffset, height1, height2, pm) {
 					if (height1 < height2) {
 						value = Math.abs(height1 - height2);
 					}
-					pm.add([value], heightoffset);
-				}else {
-					
-					pm.add([0], heightoffset);
-				
 				}
-	
+		pm.add([value], heightoffset);
+		//console.log("left height:" + height1+ " right height: "+height2+" value: "+value +" heightoffset: "+heightoffset);
 }
+
+
 function updatelogic(area, logic, townReqs) {
 	
 		const actors = core
@@ -892,9 +836,10 @@ function updatelogic(area, logic, townReqs) {
 					newReqs = '';
 				}
 				actor.requirements[logic] = newReqs;
-				if (newReqs){
-					console.log(actor.name + "now logic: " +newReqs);
-				}
+				
+					console.log(actor.locationName);
+					console.log(" now "+newReqs);
+				
 			});
 		
 		let doors = core.find(c => c.name == area).doors;
@@ -923,9 +868,9 @@ function updatelogic(area, logic, townReqs) {
 					newReqs = '';
 				}
 				actor.requirements[logic] = newReqs;
-				if (newReqs){
-					console.log(door.name + " "+ actor.name + "now logic: " +newReqs);
-				}
+					console.log(actor.locationName);
+					console.log(" now "+newReqs);
+				
 			});
 				
 				
