@@ -1,8 +1,8 @@
 # cv2r - Castlevania II: Simon's Quest Randomizer [![Build Status](https://travis-ci.org/tonylukasavage/cv2r.svg?branch=master)](https://travis-ci.org/tonylukasavage/cv2r)
 
-cv2r - Castlevania II: Simon's Quest Randomizer by **BloodSweatAndCode**. Come find me and the CV2R crew for chat on gameplay, racing, and development in the [Discord](https://discord.gg/wFhkKCK)!
+cv2r - Castlevania II: Simon's Quest Randomizer by **BloodSweatAndCode** and **Kaelari**. Come find me and the CV2R crew for chat on gameplay, racing, and development in the [Discord](https://discord.gg/wRrh5ZDrZz)!
 
-Also, you can skip this repository entirely if you just want to generate a seed and play by going to the [CV2R Website](https://cv2r.herokuapp.com/).
+Also, you can skip this repository entirely if you just want to generate a seed and play by going to the [CV2R Website](https://cv2r.kaelari.tech).
 
 ## supported platforms
 
