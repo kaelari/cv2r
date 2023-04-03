@@ -24,7 +24,12 @@ LDA *$F1
 CMP #$C8
 BEQ UNPAUS
 
+CMP #$C4
+BEQ UPGRAD
+
 DONE RTS
+
+<%=downab%>
 
 ; unpause game
 UNPAUS LDA #$00

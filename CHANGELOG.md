@@ -1,5 +1,13 @@
 # CHANGELOG
 
+## 1.8.6 Kaelari 4/2/23
+* Map rando patch
+* Blob rando patch
+* Tornado rando patch
+* Invisible man sprite (Thanks BURB!)
+* Dev mode now enables down + a + b to give all items and flame whip
+
+
 ## 1.8.5 - KAELARI
 * fixed a bug with whips and multiworld
 

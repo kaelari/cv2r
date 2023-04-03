@@ -1,32 +1,55 @@
-const { core, utils: { shuffleArray, randomInt} } = require('../../../lib');
+const { core, utils: { shuffleArray, randomInt, textToBytes} } = require('../../../lib');
 
 const { log } = require('../../../lib/utils');
+
+const heightmap = {
+	254 : [0xB1, 0x86],
+	255 : [0x24, 0xFB],
+	00 : [0xB0, 0x86],
+	01 : [0xE1, 0xA6],
+	02 : [0xA9, 0xAE],
+	
+}
+var map = [];
+var leftbranches = [];
+var rightbranches = [];
+var centerbranch = [];
+
 const leftcap = {
-	jam : {
+	"jam wasteland" : {
 		rightoffset: 0xAE8F,
 		objset: 4,
 		area: 1,
 		height: 1,
 		heightoffset: 0xAEB9,
+		heightoffsetpointer: 0xAE89,
+		rightsubmap:1,
+		
 		name: 'Jam Wasteland (Deborah Cliff)',
 		mustbeleft: true,
 	},
-	vrad: {
+	"vrad mountain": {
 		height: 1,
 		objset: 4,
 		area: 0,
 		rightoffset:  0xAE82,
 		heightoffset: 0xAEB6,
+		heightoffsetpointer: 0xAE7C,
+		rightsubmap:1,
+		
 		name: 'Vrad Mountain - Part 2 (Diamond Dude)',
 		
 	},
-	strigori:{
+	"strigori":{
 		height: 1,
 		objset: 3,
 		area: 1,
 		heightoffset: 0xB3be,
 		rightoffset: 0xb395,
 		name: 'Storigoi Graveyard (Blob Boost)',
+		heightoffsetpointer: 0xB38F,
+		rightsubmap:0,
+		
 	}
 }
 const areas = {
@@ -39,6 +62,8 @@ const areas = {
 		height: 3,
 		heightoffset: 0x86C1,
 		name: 'Ondol',
+		heightoffsetpointer: 0x8672,
+		rightsubmap:0,
 	},
 	sadam: {
 		
@@ -47,7 +72,11 @@ const areas = {
 		objset: 3,
 		area: 4,
 		height: 1,
-		heightoffset: 0xB3C1
+		heightoffset: 0xB3C1,
+		heightoffsetpointer: 0xB3A7,
+		rightsubmap:0,
+		
+		
 	},
 	sadam2: {
 		leftoffset: 0xB39D,
@@ -65,7 +94,10 @@ const areas = {
 			area: 2,
 			onlyheight1: true,
 			fcrequired: true,
-		}
+		},
+		heightoffsetpointer: 0xB39A,
+		rightsubmap:1,
+		
 	},
 	alba: {
 		leftoffset: 0x1FA1D,
@@ -75,6 +107,9 @@ const areas = {
 		height: 3,
 		heightoffset: 0x1FA4C,
 		name: 'Alba',
+		heightoffsetpointer: 0x1FA1A,
+		rightsubmap: 0,
+		
 	},
 	river : {
 		leftoffset: 0xA183,
@@ -97,6 +132,8 @@ const areas = {
 			},
 		},
 		mustbeleft: true,
+		heightoffsetpointer: 0xA180,
+		rightsubmap: 2,
 	},
 	jova: {
 		leftoffset: 0x1FA12, 
@@ -107,7 +144,8 @@ const areas = {
 		area: 0,
 		name: 'Jova',
 		nobranch: true,
-		
+		heightoffsetpointer: 0x1FA0F,
+		rightsubmap: 0,
 	},
 	jovawoods: {
 		leftoffset:0xA15C,
@@ -124,8 +162,11 @@ const areas = {
 			objset: 2,
 			area: 3,
 			leftoffset: 0xA6E3,
-			
+			throughname: "Dabi's Path",
+		
 		},
+		heightoffsetpointer: 0xA159,
+		rightsubmap: 3,
 	},
 	deniswoods: {
 		leftoffset: 0xA16D,
@@ -133,7 +174,11 @@ const areas = {
 		height: 1,
 		heightoffset: 0xA1C6,
 		objset: 2,
-		area: 1
+		area: 1,
+		heightoffsetpointer: 0xA16A,
+		rightsubmap: 0,
+		
+		
 	},
 	berkleydoor: {
 		leftoffset: 0x8D4D,
@@ -144,6 +189,8 @@ const areas = {
 		area: 1,
 		name: 'Berkeley Mansion - Door',
 		
+		heightoffsetpointer: 0x8D4A,
+		rightsubmap: 0,
 		
 	},
 	brahmdoor: {
@@ -154,6 +201,9 @@ const areas = {
 		area: 3,
 		heightoffset: 0x96ac,
 		name: 'Brahm Mansion - Door',
+		heightoffsetpointer: 0x968B,
+		rightsubmap: 0,
+		
 	},
 	deniswoods2: {
 		leftoffset:0xA6C9,
@@ -162,6 +212,9 @@ const areas = {
 		//heightoffset: 0xA6F3,
 		objset: 2,
 		area: 4,
+		heightoffsetpointer: 0xA6C6,
+		rightsubmap: 1,
+		
 	},
 	dabispath: {
 		leftoffset: 0xA6B8,
@@ -183,7 +236,10 @@ const areas = {
 			minlength: 1,
 			maxlength: 2,
 			onlyheight1: true,
-		}
+		},
+		heightoffsetpointer: 0xA6B5,
+		rightsubmap: 3,
+		
 	},
 	aljibawoods: {
 		leftoffset: 0xA6AD,
@@ -192,6 +248,8 @@ const areas = {
 		heightoffset: 0xA6F1,
 		objset: 2,
 		area: 2,
+		heightoffsetpointer: 0xA6AA,
+		rightsubmap: 0,
 		
 	},
 	aljiba: {
@@ -202,6 +260,9 @@ const areas = {
 		objset: 0,
 		area: 2,
 		name: 'Aljiba',
+		heightoffsetpointer: 0x1FAD2,
+		rightsubmap: 0,
+		
 	},
 	bodley: {
 		height: 1,
@@ -211,6 +272,9 @@ const areas = {
 		area: 4,
 		heightoffset: 0x9a7c,
 		name: 'Bodley Mansion - Door',
+		heightoffsetpointer: 0x9A61,
+		rightsubmap: 0,
+		
 	},
 	laruba: {
 		height: 1,
@@ -220,6 +284,9 @@ const areas = {
 		objset: 1,
 		area: 0,
 		name: 'Laruba Mansion - Door',
+		heightoffsetpointer: 0x88D7,
+		rightsubmap: 0,
+		
 	},
 	ditch: {
 		leftoffset: 0xAE99,
@@ -228,6 +295,9 @@ const areas = {
 		heightoffset: 0xAEBA,
 		objset: 4,
 		area: 2,
+		heightoffsetpointer: 0xAE96,
+		rightsubmap: 0,
+		
 	},
 	doina: {
 		height: 1,
@@ -237,16 +307,20 @@ const areas = {
 		objset: 0,
 		area: 5,
 		name: "Doina",
+		heightoffsetpointer: 0x1FADD,
+		rightsubmap: 0,
 		
 	},
 	yomi: {
 		height: 1,
 		leftoffset: 0x1FAEB,
 		rightoffset: 0x1FAEE,
-		heightoffset: 0x80E2,
+		heightoffset: 0x100E2,
 		objset: 0,
 		area: 6,
-		
+		heightoffsetpointer: 0x1FAE8,
+		rightsubmap: 0,
+		name: 'Yomi'
 	},
 	veros:  {
 		height: 1,
@@ -255,6 +329,10 @@ const areas = {
 		leftoffset: 0x866A,
 		rightoffset: 0x866D,
 		name: 'Veros',
+		heightoffset: 0x86C0,
+		heightoffsetpointer: 0x8667,
+		rightsubmap: 0,
+		
 	},
 	debiouswoods: {
 		leftoffset:0xB7DA,
@@ -264,9 +342,14 @@ const areas = {
 		height: 1,
 		addrequires: "(BLUE_CRYSTAL && WHITE_CRYSTAL && (HOLY_WATER || NAIL) && LAURELS)",
 		
-		name: 'Debious Woods - Part 3'
+		name: 'Debious Woods - Part 3',
+		
+		heightoffsetpointer: 0xB7D7,
+		rightsubmap: 4,
+		
+		
 	},
-	bridgeofdoom: {
+	"bridge o doom": {
 		height: 1,
 		leftoffset: 0xA192,
 		rightoffset: 0xA195,
@@ -282,6 +365,10 @@ const areas = {
 			maxlength: 2,
 			onlyheight1: true,
 		},
+		
+		heightoffsetpointer: 0xA18F,
+		rightsubmap: 2,
+		
 	}
 	
 };
@@ -293,7 +380,9 @@ var midcap = {
 	area: 0,
 	rightoffset: 0xB388,
 	heightoffset: 0xb3bd,
-	
+	heightoffsetpointer: 0xB382,
+	rightsubmap: 1,
+	name: 'Camilla Cemetery',	
 };
 var rightcap = {
 		rover: {
@@ -329,6 +418,7 @@ module.exports = {
 	id: 'map-rando',
 	name: 'Map Randomizer',
 	description: 'Map is randomized',
+	conflicts: 'Town-rando',
 	patch: function (pm, opts) {
 		const { logic, rng } = opts;
 		
@@ -342,7 +432,7 @@ module.exports = {
 		
 		var leftcaps = Object.keys(leftcap);
 		shuffleArray(leftcaps, rng);
-		console.log(leftcaps);
+		
 		var rightcaps = Object.keys(rightcap);
 		shuffleArray(rightcaps, rng);
 		//console.log("starting leftcap" +leftcaps[0]); 
@@ -360,7 +450,7 @@ module.exports = {
 		branches = keys.filter(a => areas[a].branch != null);
 		//console.log(branches);
 		j=0;
-		console.log(keys);
+		
 		while (j< branches.length){
 				//we go the other way through a branch and connect to a leftcap
 				//or we start from a new leftcap and go to this cap
@@ -368,12 +458,15 @@ module.exports = {
 				if (areas[branches[j]].branch.requirements){
 					branchreqs = areas[branches[j]].branch.requirements[logic];
 				}
-				console.log("creating array for " + branches[j]);
+				
+				
 				areas[branches[j]].contains = [];
 				var screens = randomInt(rng, areas[branches[j]].branch.minlength, areas[branches[j]].branch.maxlength);
 				var i = 0;
 				
 				last2 = areas[branches[j]];
+				leftbranches[j] = [];
+				leftbranches[j].push(branches[j]);
 				
 				while (screens > 0 && keys[i] ){
 					if (areas[keys[i]].branch || areas[keys[i]].throughbranch || areas[keys[i]].rightbranch || areas[keys[i]].nobranch ){
@@ -386,6 +479,7 @@ module.exports = {
 						continue;
 						
 					}
+					
 					if (areas[keys[i]].name){
 						areas[branches[j]].contains.push(areas[keys[i]].name);
 					}
@@ -414,11 +508,11 @@ module.exports = {
 						attach( areas[keys[i]],last2, {}, pm);
 					}
 					if (last2.name){
-						console.log("updating "+last2.name+" with "+branchreqs);
+						
 						updatelogic(last2.name, logic, branchreqs);
 					}
 					last2 = areas[keys[i]];
-					
+					leftbranches[j].push(keys[i]);
 					keys.splice(i, 1);
 					screens--;
 					
@@ -426,6 +520,7 @@ module.exports = {
 				//throw a cap on it
 				
 			var left = leftcap[leftcaps[0]];
+			leftbranches[j].push(leftcaps[0]);
 			leftcaps.splice(0, 1);
 			if (last2.branch){
 				attach(left, last2, {leftbranch:true, rightfc: true}, pm);		
@@ -437,21 +532,15 @@ module.exports = {
 				
 			}
 			if (left.name){
-				console.log(branches[j]+ " contains now " +left.name);
+				
 				updatelogic(left.name, logic, branchreqs);
 				areas[branches[j]].contains.push(left.name);
-				console.log(areas[branches[j]]);
+				
 			}
 			if (left.mustbeleft){
 				areas[branches[j]].mustbeleft = true;
-				console.log("must be left!");
-				console.log(left);
-				console.log(areas[branches[j]]);
-			}else {
-				console.log("doesn't need to be left "+ j);
-				console.log(left);
-				
 			}
+			
 			j++;
 		}
 		branches = keys.filter(a => areas[a].throughbranch != null);
@@ -463,6 +552,8 @@ module.exports = {
 				
 				var screens = randomInt(rng, areas[branches[j]].throughbranch.minlength, areas[branches[j]].throughbranch.maxlength);
 				var i = 0;
+				centerbranch[j] = [];
+				centerbranch[j].push(branches[j]);
 				
 				last2 = areas[branches[j]];
 				areas[branches[j]].contains = [];
@@ -496,16 +587,18 @@ module.exports = {
 					}
 					
 					last2 = areas[keys[i]];
-					
+					centerbranch[j].push(keys[i]);
 					keys.splice(i, 1);
 					screens--;
 					
 				}
 				//throw a cap on it
 				throughcap = areas[branches[j]];
+				centerbranch[j].push(throughcap.throughbranch.throughname);
+				
 				pm.add([0xFC, throughcap.throughbranch.objset, throughcap.throughbranch.area ], last2.rightoffset);
 				pm.add([0xFF, last2.objset, last2.area ], throughcap.throughbranch.leftoffset)
-			
+				
 			
 			j++;
 		}
@@ -520,12 +613,13 @@ module.exports = {
 					branchreqs = areas[branches[j]].rightbranch.requirements[logic];
 				}
 				areas[branches[j]].contains = [];
+				rightbranches[j]=[];
 				
 				var screens = randomInt(rng, areas[branches[j]].rightbranch.minlength, areas[branches[j]].rightbranch.maxlength);
 				var i = 0;
 				
 				last2 = areas[branches[j]];
-				
+				rightbranches[j].push(branches[j]);
 				while (screens > 0 && keys[i] ){
 					if (areas[keys[i]].branch || areas[keys[i]].throughbranch || areas[keys[i]].rightbranch || areas[keys[i]].nobranch ){
 						i++;
@@ -559,13 +653,14 @@ module.exports = {
 						updatelogic(last2.name, logic, branchreqs);
 					}
 					last2 = areas[keys[i]];
-					
+					rightbranches[j].push(keys[i]);
 					keys.splice(i, 1);
 					screens--;
 					
 				}
 				//throw a cap on it
 			var right = rightcap[rightcaps[0]];
+			rightbranches[j].push(rightcaps[0]);
 			rightcaps.splice(0, 1);
 			attach(last2, right, {}, pm);		
 			if (last2.name){
@@ -593,15 +688,15 @@ module.exports = {
 		
 		leftareas= keys.filter(a=> areas[a].mustbeleft == true);
 		z = 0;
-		console.log(leftareas);
+		
 		while (leftareas.length > z){
 			const position = randomInt(rng, 0, sizeofleft-1);
 			keys.splice(position, 0, keys.splice(keys.indexOf(leftareas[z]), 1)[0]);	
-			console.log(leftareas[z] + " must be left now "+position);
+			
 			z++;
 		}
 		
-		
+		map.push(leftcaps[0]);
 		last = leftcap[leftcaps[0]];
 		leftcaps.splice(0, 1);
 		
@@ -621,7 +716,7 @@ module.exports = {
 				
 			}
 			
-			
+			map.push(keys[0]);
 			attach(last, areas[keys[0]], {}, pm);
 			
 			if (last.name){
@@ -630,11 +725,11 @@ module.exports = {
 				
 			}
 			if (last.contains){
-				console.log("this is a branch " +last.name);
-				console.log(last.contains);
+				
+				
 			}
 			last = areas[keys[0]];
-			console.log(keys[0]);
+			
 			keys.splice(0, 1);
 			
 			sizeofleft -=1;
@@ -649,21 +744,23 @@ module.exports = {
 		if (midcap.name){
 			updatelogic(midcap.name, logic, '');
 		}
+		
+		map.push(midcap.name);
 		var height = last.height;
 		if (last.rightheight != null ){
 			height = last.rightheight;
 			
 		}
-		adjustheight(last.heightoffset, last.height, midcap.height, pm);
+		adjustheight(last.heightoffsetpointer, last.rightsubmap, last.height, midcap.height, pm);
 		var requirements="";
 		if (logic === "standard"){
 			requirements = "(WHITE_CRYSTAL && BLUE_CRYSTAL && RED_CRYSTAL)";
 			
 		}
 		last = midcap;
-		console.log("part b, post tornado");
+		//console.log("part b, post tornado");
 		while (keys.length>0) {
-			console.log(keys[0]);
+			
 			if (!last.heightoffset && areas[keys[0]].height > 1){
 				//we need to adjust so we don't put this tile here
 				//console.log("We're trying to put a non height 1 next to a height non-adjustable!"+ keys[0]);
@@ -681,24 +778,24 @@ module.exports = {
 				updatelogic(last.name, logic, requirements);
 			}
 			if (last.branch){
-				console.log("this is a branch");
+				
 				
 			}
 			if (last.contains){
-				console.log("branch");
-				console.log(last);
+				
+				
 				for (i=0; i< last.contains.length; i++) {
 					updatelogic(last.contains[i], logic, requirements);
 				}
 			}
 			
-			
+			map.push(keys[0]);
 			last = areas[keys[0]];
-			console.log(keys[0]);
+			
 			keys.splice(0, 1);
 
 		}
-		
+		map.push(rightcaps[0]);
 		var right = rightcap[rightcaps[0]];
 				
 				rightcaps.splice(0, 1);
@@ -715,12 +812,12 @@ module.exports = {
 					height = last.rightbranch.height;
 					
 				}
-				adjustheight(last.heightoffset, height, right.height, pm);
+				adjustheight(last.heightoffsetpointer, last.rightsubmap, height, right.height, pm);
 				if (last.name){
 					updatelogic(last.name, logic, requirements);
 				}
 				if (last.contains) {
-					console.log(last);
+					
 					for (i=0; i< last.contains.length; i++) {
 						updatelogic(last.contains[i], logic, requirements);
 					}
@@ -739,8 +836,104 @@ module.exports = {
 		const tornadodestobjset = [3];
 		pm.add(tornadovalue, tornadooffset);
 		pm.add(tornadodestobjset, 0x1d092);
+// 		console.log(map.join("->"));
+		signs(map, pm);
+		leftbranches.forEach( branch => {
+			const foo  = branch.reverse();
+			signs(foo, pm)
+		});
+		centerbranch.forEach( branch => {
+			signs(branch, pm)
+		});
+		rightbranches.forEach( branch => {
+			signs(branch, pm)
+		});
+				
 		
 		//updatelogic('Debious Woods - Part 3', logic, "(RED_CRYSTAL && BLUE_CRYSTAL && WHITE_CRYSTAL && HEART && NAIL && RIB && RING && MAGIC_CROSS && EYEBALL && GARLIC && HOLY_WATER)");
+	}
+	
+}
+
+function signs (map, pm) {
+// 	console.log(map);
+	for ( i = 0; i < map.length; i++){
+			var m = map[i];
+			
+			if (areas[m] != undefined){
+				if (areas[m].name) {
+				//console.log(areas[m]);
+					const actors = core
+					.filter(loc => loc.name === areas[m].name)
+					.reduce((a, c) => {
+						return a.concat(c.actors || []);
+					}, []);
+					//console.log(actors);
+					const sign=actors.find(a => a.name == "sign");
+					if (sign != undefined){
+						//const line1= areas[m].name+"\n";
+						var chars = 13 - areas[m].name.length;
+						chars = Math.floor(chars/2);
+						
+						const line1 = " ".repeat(chars) + areas[m].name + "\n";
+						
+						const line2 = "Left for\n";
+						var line3 = "";
+						for (z=1; map[i-z] != undefined; z++){
+							if (areas[map[i-z]] != undefined){
+								if (areas[map[i-z]].name != undefined){
+									
+									line3 = areas[map[i-z]].name;
+									line3 = line3.substring(0, 13);
+									
+									line3 += "\n";
+									break;
+								}
+								
+							}
+							if (midcap.name == map[i-z]) {
+									line3 = map[i-z].substring(0,13);
+									line3 += "\n";
+									break;
+							}
+						}
+						if (line3 === "") {
+							line3 = map[0]+"\n";
+							
+						}
+						line3 = line3.replace('-', "");
+						const line4 = "Right for\n";
+						var line5 = "";
+						for (z=1; map[i+z] != undefined; z++){
+							if (areas[map[i+z]] != undefined){
+								if (areas[map[i+z]].name){
+									
+									line5 = areas[map[i+z]].name;
+									line5 = line5.substring(0, 13);
+									line5 += "\n";
+									break;
+								}
+							}
+							if (midcap.name == map[i+z]) {
+									line5 = map[i+z];
+									line5 = line5.substring(0, 13);
+									line5 += "\n";
+									break;
+							}
+						}
+						if (line5 === "" ) {
+							line5 = map[map.length-1]+"\n";
+
+						}
+						line5 = line5.replace('-', "");
+						var newtext = line1+line2+line3+line4+line5;
+// 						console.log("text is now: " +newtext);
+						newtext = newtext.substring(0, sign.text.length);
+						const textBytes = textToBytes(newtext);
+						pm.add(textBytes, sign.textPointer);
+					}
+				}
+			}
 	}
 	
 }
@@ -782,18 +975,18 @@ function attach (left, right, options, pm){
 	if (options.noheightchange || left.heightoffset == null){
 		
 	}else {
-		adjustheight(left.heightoffset, left.height, right.height, pm);
+		adjustheight(left.heightoffsetpointer, left.rightsubmap, left.height, right.height, pm);
 	}
 	
 	
 }
 
 
-function adjustheight(heightoffset, height1, height2, pm) {
-		if (!heightoffset) {
-			console.log("no heightoffset! Probably a problem");
+function adjustheight(heightoffsetpointer, submap, height1, height2, pm) {
+		if (!heightoffsetpointer) {
+// 			console.log("no heightoffset! Probably a problem");
 			if (height1 != height2){
-				console.log("height problem for sure");
+// 				console.log("height problem for sure");
 				
 			}
 			return;
@@ -807,7 +1000,16 @@ function adjustheight(heightoffset, height1, height2, pm) {
 						value = Math.abs(height1 - height2);
 					}
 				}
-		pm.add([value], heightoffset);
+		//pm.add([value], heightoffset);
+		
+// 		console.log(heightoffsetpointer.toString(16) + " -> "+value.toString(16)+ " : "+heightmap[value][1].toString(16) +heightmap[value][0].toString(16));
+// 		console.log("submap: "+submap);
+		var bytes =[];
+		bytes[0]= heightmap[value][0];
+		bytes[1]= heightmap[value][1];
+		bytes[0]-=submap;
+		pm.add(bytes, heightoffsetpointer);
+		
 		//console.log("left height:" + height1+ " right height: "+height2+" value: "+value +" heightoffset: "+heightoffset);
 }
 
@@ -837,8 +1039,8 @@ function updatelogic(area, logic, townReqs) {
 				}
 				actor.requirements[logic] = newReqs;
 				
-					console.log(actor.locationName);
-					console.log(" now "+newReqs);
+// 					console.log(actor.locationName);
+// 					console.log(" now "+newReqs);
 				
 			});
 		
@@ -868,8 +1070,8 @@ function updatelogic(area, logic, townReqs) {
 					newReqs = '';
 				}
 				actor.requirements[logic] = newReqs;
-					console.log(actor.locationName);
-					console.log(" now "+newReqs);
+// 					console.log(actor.locationName);
+// 					console.log(" now "+newReqs);
 				
 			});
 				

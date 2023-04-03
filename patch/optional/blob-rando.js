@@ -9,8 +9,8 @@ module.exports = {
 	pre: true,
 	order:10,
 	id: 'blob-rando',
-	name: 'blob Randomizer',
-	description: 'blob goes to random place',
+	name: 'Blob Randomizer',
+	description: 'blob goes to random town or mansion',
 	patch: function (pm, opts) {
 		const { logic, rng } = opts;
 		let areas= core.filter(c => c.blobdest == 1);

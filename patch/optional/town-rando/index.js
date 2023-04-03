@@ -324,6 +324,7 @@ module.exports = {
 	id: 'town-rando',
 	name: 'Town Randomizer',
 	description: 'Towns and mansions in random places',
+	conflicts: 'Map-rando',
 	patch: function (pm, opts) {
 	
 		const { logic, rng } = opts;
