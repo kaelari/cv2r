@@ -11,6 +11,8 @@ module.exports = {
 	name: 'Lazy River',
 	requires: 'enemizer',
 	description: 'Only spawn fishmen on Dead River, like vanilla CV2',
+	//qol, random, difficulty, misc
+	type: 'difficulty',
 	patch: function(pm) {
 		const { core } = require('../../lib');
 		const deadRiverLocs = [

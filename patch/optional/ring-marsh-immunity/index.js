@@ -9,6 +9,8 @@ module.exports = {
 	id: 'ring-marsh-immunity',
 	name: 'Ring Marsh Immunity',
 	description: 'When Simon has Dracula\'s ring equipped, he takes no damage from marshes',
+	//qol, random, difficulty, misc
+	type: 'difficulty',
 	patch: function(pm) {
 		// change game logic so that all LAURELS are now [ LAURELS, RING ]
 		// core.forEach(loc => {

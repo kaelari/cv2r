@@ -23,6 +23,8 @@ module.exports = {
 	id: 'custom-text',
 	name: 'Custom Text',
 	description: 'All the dialog is now a little more fun in CV2R',
+	//qol, random, difficulty, misc
+	type: 'qol',
 	patch: async function(pm, { rng }) {
 		// load original text pointers
 		const textPointers = [];

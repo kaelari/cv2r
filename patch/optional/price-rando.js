@@ -4,6 +4,8 @@ module.exports = {
 	id: 'price-rando',
 	name: 'Price Randomizer',
 	description: 'Randomize merchant prices by +/-25%',
+	//qol, random, difficulty, misc
+	type: 'random',
 	patch: function(pm, opts) {
 		const { core, utils: { randomDecimal } } = require('../../lib');
 		const { rng } = opts;

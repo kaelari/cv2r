@@ -5,6 +5,8 @@ module.exports = {
 	id: 'drac-downgrade',
 	name: 'Dracula Fight Downgrade',
 	description: 'Once Dracula\'s summoning blaze lights, Simon is given a thorn whip and has his level set to level 2.',
+	//qol, random, difficulty, misc
+	type: 'difficulty',
 	patch: function(pm) {
 		modSubroutine(pm.name, path.join(__dirname, 'drac-downgrade.asm'), bank[1], {
 			invoke: {

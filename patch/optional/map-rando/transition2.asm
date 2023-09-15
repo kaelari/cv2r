@@ -1,0 +1,17 @@
+CMP #$FF
+BEQ done
+CMP #$F9
+BNE RETURN
+
+LDA #$70
+STA $324
+LDA #$00
+STA $56
+STA $57
+
+done
+JMP $D126
+
+
+RETURN
+JMP $D1F8

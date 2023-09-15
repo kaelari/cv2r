@@ -11,6 +11,8 @@ module.exports = {
 	id: 'blob-rando',
 	name: 'Blob Randomizer',
 	description: 'blob goes to random town or mansion',
+	//qol, random, difficulty, misc
+	type: 'random',
 	patch: function (pm, opts) {
 		const { logic, rng } = opts;
 		let areas= core.filter(c => c.blobdest == 1);
@@ -20,7 +22,7 @@ module.exports = {
 		const bloboffset = 0xB392;
 		
 		pm.add(blobvalue, bloboffset);
-		log("blob to: " + areas[index].name);
+// 		log("blob to: " + areas[index].name);
 		
 	}
 }

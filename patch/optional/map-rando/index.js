@@ -1,5 +1,5 @@
-const { core, utils: { shuffleArray, randomInt, textToBytes} } = require('../../../lib');
-
+const { assemble, bank, core, utils: { modSubroutine, shuffleArray, randomInt, textToBytes} } = require('../../../lib');
+const path = require('path');
 const { log } = require('../../../lib/utils');
 
 const heightmap = {
@@ -14,7 +14,7 @@ var map = [];
 var leftbranches = [];
 var rightbranches = [];
 var centerbranch = [];
-
+var tornadorequires = "WHITE_CRYSTAL && BLUE_CRYSTAL && RED_CRYSTAL";
 const leftcap = {
 	"jam wasteland" : {
 		rightoffset: 0xAE8F,
@@ -24,9 +24,10 @@ const leftcap = {
 		heightoffset: 0xAEB9,
 		heightoffsetpointer: 0xAE89,
 		rightsubmap:1,
-		
+		heightmap: [0x00, 0x02],
 		name: 'Jam Wasteland (Deborah Cliff)',
 		mustbeleft: true,
+		tornadosource: true,
 	},
 	"vrad mountain": {
 		height: 1,
@@ -34,19 +35,21 @@ const leftcap = {
 		area: 0,
 		rightoffset:  0xAE82,
 		heightoffset: 0xAEB6,
+		heightmap: [0x00, 0x00],
 		heightoffsetpointer: 0xAE7C,
 		rightsubmap:1,
 		
 		name: 'Vrad Mountain - Part 2 (Diamond Dude)',
 		
 	},
-	"strigori":{
+	"storigoi":{
 		height: 1,
 		objset: 3,
 		area: 1,
 		heightoffset: 0xB3be,
 		rightoffset: 0xb395,
 		name: 'Storigoi Graveyard (Blob Boost)',
+		heightmap: [0x00],
 		heightoffsetpointer: 0xB38F,
 		rightsubmap:0,
 		
@@ -68,18 +71,21 @@ const areas = {
 	sadam: {
 		
 		leftoffset: 0xB3AA,
+		righttype: 0xf9,
 		rightoffset: 0xB3AD,
 		objset: 3,
 		area: 4,
 		height: 1,
 		heightoffset: 0xB3C1,
+		heightmap: [0x00],
 		heightoffsetpointer: 0xB3A7,
 		rightsubmap:0,
 		
 		
 	},
-	sadam2: {
+	sadamwoods: {
 		leftoffset: 0xB39D,
+		lefttype: 0xf9,
 		rightoffset: 0xB3A0,
 		objset: 3,
 		area: 2,
@@ -95,6 +101,7 @@ const areas = {
 			onlyheight1: true,
 			fcrequired: true,
 		},
+		heightmap: [0x00, 0x02, 0xFF, 0x00, 0x00],
 		heightoffsetpointer: 0xB39A,
 		rightsubmap:1,
 		
@@ -131,7 +138,7 @@ const areas = {
 				diamondWarp: 'HEART'
 			},
 		},
-		mustbeleft: true,
+// 		mustbeleft: true,
 		heightoffsetpointer: 0xA180,
 		rightsubmap: 2,
 	},
@@ -144,12 +151,14 @@ const areas = {
 		area: 0,
 		name: 'Jova',
 		nobranch: true,
+		mustbeleft: true,
 		heightoffsetpointer: 0x1FA0F,
 		rightsubmap: 0,
 	},
 	jovawoods: {
 		leftoffset:0xA15C,
 		rightoffset: 0xA15F,
+		righttype: 0xf9,
 		height: 1,
 		rightheight: 1,
 		heightoffset: 0xA1CA,
@@ -171,6 +180,7 @@ const areas = {
 	deniswoods: {
 		leftoffset: 0xA16D,
 		rightoffset: 0xa170,
+		lefttype: 0xf9,
 		height: 1,
 		heightoffset: 0xA1C6,
 		objset: 2,
@@ -208,8 +218,9 @@ const areas = {
 	deniswoods2: {
 		leftoffset:0xA6C9,
 		rightoffset: 0xA6CC,
+		righttype: 0xF9,
 		height: 1,
-		//heightoffset: 0xA6F3,
+		heightoffset: 0xA6F3,
 		objset: 2,
 		area: 4,
 		heightoffsetpointer: 0xA6C6,
@@ -218,7 +229,9 @@ const areas = {
 	},
 	dabispath: {
 		leftoffset: 0xA6B8,
+		lefttype: 0xf9,
 		rightoffset: 0xA6BB,
+		righttype: 0xf9,
 		height: 1,
 		rightheight: 1,
 		heightoffset: 0xA6F5,
@@ -244,6 +257,7 @@ const areas = {
 	aljibawoods: {
 		leftoffset: 0xA6AD,
 		rightoffset:0xA6B0,
+		lefttype: 0xf9,
 		height: 1,
 		heightoffset: 0xA6F1,
 		objset: 2,
@@ -254,6 +268,7 @@ const areas = {
 	},
 	aljiba: {
 		leftoffset: 0x1FAD5,
+		
 		rightoffset: 0x1FAD8,
 		height: 2,
 		heightoffset: 0x1FB34,
@@ -295,6 +310,7 @@ const areas = {
 		heightoffset: 0xAEBA,
 		objset: 4,
 		area: 2,
+		heightmap: [0x00],
 		heightoffsetpointer: 0xAE96,
 		rightsubmap: 0,
 		
@@ -344,8 +360,9 @@ const areas = {
 		
 		name: 'Debious Woods - Part 3',
 		
-		heightoffsetpointer: 0xB7D7,
-		rightsubmap: 4,
+		//heightoffsetpointer: 0xB7D7,
+		rightsubmap: 5,
+		heightmap: [00, 02, 0xFF, 00, 00],
 		
 		
 	},
@@ -353,6 +370,7 @@ const areas = {
 		height: 1,
 		leftoffset: 0xA192,
 		rightoffset: 0xA195,
+		righttype: 0xf9,
 		//heightoffset: 0xA1C9,  //also used elsewhere. yes grrr
 		objset: 2,
 		area: 8,
@@ -365,7 +383,7 @@ const areas = {
 			maxlength: 2,
 			onlyheight1: true,
 		},
-		
+		zzz: "bridgeofdoom",
 		heightoffsetpointer: 0xA18F,
 		rightsubmap: 2,
 		
@@ -380,6 +398,7 @@ var midcap = {
 	area: 0,
 	rightoffset: 0xB388,
 	heightoffset: 0xb3bd,
+	heightmap: [0x00, 0x00],
 	heightoffsetpointer: 0xB382,
 	rightsubmap: 1,
 	name: 'Camilla Cemetery',	
@@ -391,14 +410,15 @@ var rightcap = {
 			objset: 2,
 			area: 5,
 			requirements: {
-				standard: 'BLUE_CRYSTAL',
-				glitch: 'BLUE_CRYSTAL',
-				diamondWarp: 'BLUE_CRYSTAL'
+				standard: 'WHITE_CRYSTAL && BLUE_CRYSTAL',
+				glitch: 'WHITE_CRYSTAL && BLUE_CRYSTAL',
+				diamondWarp: 'WHITE_CRYSTAL && BLUE_CRYSTAL'
 			},
 			name: 'Rover Mansion - Door'
 		},
 		bordia: {
 			leftoffset: 0xa1a1,
+			lefttype: 0xf9,
 			height: 1,
 			objset: 2,
 			area: 9,
@@ -419,6 +439,8 @@ module.exports = {
 	name: 'Map Randomizer',
 	description: 'Map is randomized',
 	conflicts: 'Town-rando',
+	//qol, random, difficulty, misc
+	type: 'random',
 	patch: function (pm, opts) {
 		const { logic, rng } = opts;
 		
@@ -438,17 +460,22 @@ module.exports = {
 		//console.log("starting leftcap" +leftcaps[0]); 
 		sizeofleft= randomInt(rng, 5, 10);
 		//console.log(keys.indexOf("jova"));
-		if (keys.indexOf("jova") > sizeofleft ) {
-			const position = randomInt(rng, 1, sizeofleft-2);
-			keys.splice(position, 0, keys.splice(keys.indexOf("jova"), 1)[0]);	
-			
-		}
 		
+		//we grab a town or mansion to be right of camilla cemetery for tornado to not derp.
+		townsmansion = keys.filter( a => areas[a].objset === 1 || areas[a].objset === 0);
+		shuffleArray(townsmansion, rng);
+		reservedtown = keys.splice(keys.indexOf(townsmansion[0]), 1);
+		if (reservedtown == "jova"){
+			reservedtown = keys.splice(keys.indexOf(townsmansion[0]), 1);
+			keys.unshift("jova");
+		}
+			
 		//debious woods always goes first so it's in the first left branch
 		keys.splice(0, 0, keys.splice(keys.indexOf("debiouswoods"), 1)[0]);	
 		
+		
 		branches = keys.filter(a => areas[a].branch != null);
-		//console.log(branches);
+		
 		j=0;
 		
 		while (j< branches.length){
@@ -480,24 +507,14 @@ module.exports = {
 						
 					}
 					
-					if (areas[keys[i]].name){
-						areas[branches[j]].contains.push(areas[keys[i]].name);
-					}
-					if (areas[keys[i]].addrequires){
-						if (branchreqs){
-							branchreqs = "( "+branchreqs+") && ("+areas[keys[i]].addrequires+")";
-						}else {
-							branchreqs = areas[keys[i]].addrequires;
-							
-						}
-						
-					}
+					
 					var rightfc = false;
 					if (last2.branch){
 						
 						if (last2.branch.onlyheight1){
 							if (areas[keys[i]].height > 1){
 								i++;
+                                
 								continue;
 							}
 							rightfc= true;
@@ -507,10 +524,27 @@ module.exports = {
 					}	else {
 						attach( areas[keys[i]],last2, {}, pm);
 					}
+					if (areas[keys[i]].name){
+						areas[branches[j]].contains.push(areas[keys[i]].name);
+					}
+					
+					if (areas[keys[i]].addrequires){
+                        
+                        
+						if (branchreqs){
+							branchreqs = "( "+branchreqs+") && ("+areas[keys[i]].addrequires+")";
+						}else {
+							branchreqs = areas[keys[i]].addrequires;
+							
+						}
+						
+					}
+					
 					if (last2.name){
 						
 						updatelogic(last2.name, logic, branchreqs);
 					}
+					
 					last2 = areas[keys[i]];
 					leftbranches[j].push(keys[i]);
 					keys.splice(i, 1);
@@ -528,6 +562,7 @@ module.exports = {
 				attach(left, last2, {}, pm);		
 			}
 			if (last2.name){
+                
 				updatelogic(last2.name, logic, branchreqs);
 				
 			}
@@ -540,7 +575,11 @@ module.exports = {
 			if (left.mustbeleft){
 				areas[branches[j]].mustbeleft = true;
 			}
-			
+			if (left.tornadosource && branchreqs){
+				tornadorequires = "( "+ tornadorequires+" && "+branchreqs+")";
+				//console.log("tornado now requires: "+tornadorequires);
+				
+			}
 			j++;
 		}
 		branches = keys.filter(a => areas[a].throughbranch != null);
@@ -567,14 +606,14 @@ module.exports = {
 						i++;
 						continue;
 					}
-					if (!areas[keys[i]].heightoffset && screens ==1) {
-						i++;
-						continue;
-					}
-					if (!last2.heightoffset && areas[keys[i]].height > 1 ){
-						i++;
-						continue;
-					}
+// 					if (!areas[keys[i]].heightoffset && screens ==1) {
+// 						i++;
+// 						continue;
+// 					}
+// 					if (!last2.heightoffset && areas[keys[i]].height > 1 ){
+// 						i++;
+// 						continue;
+// 					}
 					if (last2.name){
 						areas[branches[j]].contains.push(last2.name);
 					}
@@ -597,8 +636,11 @@ module.exports = {
 				centerbranch[j].push(throughcap.throughbranch.throughname);
 				
 				pm.add([0xFC, throughcap.throughbranch.objset, throughcap.throughbranch.area ], last2.rightoffset);
-				pm.add([0xFF, last2.objset, last2.area ], throughcap.throughbranch.leftoffset)
-				
+				if (last2.righttype){
+					pm.add([last2.righttype, last2.objset, last2.area ], throughcap.throughbranch.leftoffset);
+				}else {
+					pm.add([0xFF, last2.objset, last2.area ], throughcap.throughbranch.leftoffset);
+				}
 			
 			j++;
 		}
@@ -650,6 +692,7 @@ module.exports = {
 						attach( last2, areas[keys[i]], {}, pm);
 					}
 					if (last2.name){
+                        
 						updatelogic(last2.name, logic, branchreqs);
 					}
 					last2 = areas[keys[i]];
@@ -664,17 +707,21 @@ module.exports = {
 			rightcaps.splice(0, 1);
 			attach(last2, right, {}, pm);		
 			if (last2.name){
+                
 				updatelogic(last2.name, logic, branchreqs);
 			}
 			if (right.name){
 				if (right.requirements && branchreqs){
+                    
 					updatelogic(right.name, logic, right.requirements[logic]+" && "+branchreqs);	
 				}else if (right.requirements){
-				
+                    
 					updatelogic(right.name, logic, right.requirements[logic]);	
 				}else if (branchreqs) {
+                    
 					updatelogic(right.name, logic, right.branchreqs);	
 				}else {
+                    
 					updatelogic(right.name, logic, "");	
 				}
 				
@@ -686,13 +733,16 @@ module.exports = {
 		}
 		
 		
-		leftareas= keys.filter(a=> areas[a].mustbeleft == true);
+		leftareas= keys.filter(a=> areas[a].mustbeleft === true);
 		z = 0;
+		//console.log(leftareas);
+		//console.log(keys);
 		
 		while (leftareas.length > z){
-			const position = randomInt(rng, 0, sizeofleft-1);
-			keys.splice(position, 0, keys.splice(keys.indexOf(leftareas[z]), 1)[0]);	
 			
+			const position = randomInt(rng, 0, sizeofleft-leftareas.length);
+			keys.splice(position, 0, keys.splice(keys.indexOf(leftareas[z]), 1)[0]);	
+			//console.log("moving "+leftareas[z]+" "+position);
 			z++;
 		}
 		
@@ -734,14 +784,15 @@ module.exports = {
 			
 			sizeofleft -=1;
 		}
-		
-		pm.add([0xFF, midcap.objset, midcap.area ], last.rightoffset);
-		pm.add([0xFF, last.objset, last.area ], midcap.leftoffset);
+		attach(last, midcap, {}, pm);
+// 		pm.add([0xFF, midcap.objset, midcap.area ], last.rightoffset);
+// 		pm.add([0xFF, last.objset, last.area ], midcap.leftoffset);
 		if (last.name){
-		
+            
 			updatelogic(last.name, logic, '');
 		}
 		if (midcap.name){
+            
 			updatelogic(midcap.name, logic, '');
 		}
 		
@@ -754,27 +805,30 @@ module.exports = {
 		adjustheight(last.heightoffsetpointer, last.rightsubmap, last.height, midcap.height, pm);
 		var requirements="";
 		if (logic === "standard"){
-			requirements = "(WHITE_CRYSTAL && BLUE_CRYSTAL && RED_CRYSTAL)";
+			requirements = tornadorequires;
 			
 		}
 		last = midcap;
+		var tornado = null;
+		keys.unshift(reservedtown);
 		//console.log("part b, post tornado");
 		while (keys.length>0) {
 			
-			if (!last.heightoffset && areas[keys[0]].height > 1){
-				//we need to adjust so we don't put this tile here
-				//console.log("We're trying to put a non height 1 next to a height non-adjustable!"+ keys[0]);
-				var i = 1;
-				while (areas[keys[i]].height > 1){
-					i+=1;
-				}
-				
-				keys.splice(0, 0, keys.splice(i, 1)[0]);	
-				
-				
-			}
+// 			if (!last.heightoffset && areas[keys[0]].height > 1){
+// 				//we need to adjust so we don't put this tile here
+// 				//console.log("We're trying to put a non height 1 next to a height non-adjustable!"+ keys[0]);
+// 				var i = 1;
+// 				while (areas[keys[i]].height > 1){
+// 					i+=1;
+// 				}
+// 				
+// 				keys.splice(0, 0, keys.splice(i, 1)[0]);	
+// 				
+// 				
+// 			}
 			attach(last, areas[keys[0]], {}, pm);
-			if (last.name){
+			if (last.name && last != midcap){
+                
 				updatelogic(last.name, logic, requirements);
 			}
 			if (last.branch){
@@ -782,61 +836,72 @@ module.exports = {
 				
 			}
 			if (last.contains){
-				
+                branchreqs = requirements;
+                
+                
+				if (last.branch && last.branch.requirements){
+					branchreqs += "&& ("+last.branch.requirements[logic]+")";
+				}
+				if (last.rightbranch && last.rightbranch.requirements){
+					branchreqs += "&& ("+last.rightbranch.requirements[logic]+")";
+				}
 				
 				for (i=0; i< last.contains.length; i++) {
-					updatelogic(last.contains[i], logic, requirements);
+                    
+					updatelogic(last.contains[i], logic, branchreqs);
+                    //console.log("updating logic, "+last.contains[i]+" logic: "+logic+" requirements: "+branchreqs);
 				}
 			}
 			
+			//first town or mansion becomes tornado dest
+			if (tornado === null ){
+				if (areas[keys[0]].objset == 1 || areas[keys[0]].objset == 0 ){
+					tornado = areas[keys[0]];
+				
+				}
+			}
 			map.push(keys[0]);
 			last = areas[keys[0]];
 			
 			keys.splice(0, 1);
-
+			
 		}
 		map.push(rightcaps[0]);
 		var right = rightcap[rightcaps[0]];
-				
+				//console.log(last);
 				rightcaps.splice(0, 1);
+				attach(last, right, {}, pm);
 				
-				pm.add([0xFF, last.objset,last.area ], right.leftoffset);
-				if (last.rightbranch){
-					pm.add([0xFF, right.objset, right.area ], last.rightbranch.rightoffset);
-				}else {
-				
-					pm.add([0xFF, right.objset, right.area ], last.rightoffset);	
-				}
-				var height = last.height;
-				if (last.rightbranch){ 
-					height = last.rightbranch.height;
-					
-				}
-				adjustheight(last.heightoffsetpointer, last.rightsubmap, height, right.height, pm);
 				if (last.name){
+                    
 					updatelogic(last.name, logic, requirements);
 				}
 				if (last.contains) {
 					
 					for (i=0; i< last.contains.length; i++) {
+                        
 						updatelogic(last.contains[i], logic, requirements);
 					}
 				}
 				if (right.name){
 					if (right.requirements){
+                        
 						updatelogic(right.name, logic, right.requirements[logic]);
 					}
 					
 				}
 		
 		
-		
-		const tornadovalue= [0xFF, 3, 0];
+		if (tornado === null) {
+			//tornado has no dest!
+			log("ERROR NO DEST FOR TORNADO!");
+		}
+		const tornadovalue= [0xFF, tornado.objset, tornado.area];
 		const tornadooffset = 0xAE8C;
-		const tornadodestobjset = [3];
+		const tornadodestobjset = [tornado.objset];
 		pm.add(tornadovalue, tornadooffset);
 		pm.add(tornadodestobjset, 0x1d092);
-// 		console.log(map.join("->"));
+ 		//console.log(map.join("->"));
 		signs(map, pm);
 		leftbranches.forEach( branch => {
 			const foo  = branch.reverse();
@@ -846,13 +911,37 @@ module.exports = {
 			signs(branch, pm)
 		});
 		rightbranches.forEach( branch => {
+			//console.log(branch.join("->"));
 			signs(branch, pm)
 		});
-				
+		const exit = modSubroutine(pm.name, path.join(__dirname, 'transition.asm'), bank[7]);
+		const code = `JMP $${exit.ram.toString(16)}`;
+		var bytes = assemble(code);
+		pm.add(bytes, 0x1D0E0);
+		const exit2 = modSubroutine(pm.name, path.join(__dirname, 'transition2.asm'), bank[7]);
+		const code2 = `JMP $${exit2.ram.toString(16)}`;
+		bytes = assemble(code2);
+ 		bytes.push([0xEA]);
+		pm.add(bytes, 0x1D201);
+		
+		//allow lake to be drained even if the screen is scrolled down some
+		pm.add([0xA9, 0x00], 0x67CF);
+		
+		//remove the wall from the rover cave to prevent getting stuck
+		pm.add([00], 0xA8A4);
+		pm.add([00], 0xA89C);
 		
 		//updatelogic('Debious Woods - Part 3', logic, "(RED_CRYSTAL && BLUE_CRYSTAL && WHITE_CRYSTAL && HEART && NAIL && RIB && RING && MAGIC_CROSS && EYEBALL && GARLIC && HOLY_WATER)");
-	}
 	
+	const actors = core
+				.reduce((a, c) => {
+					return a.concat(c.actors || []);
+				}, []);
+	actors.filter(a => a.holdsItem).forEach(actor => {
+        
+//         console.log(actor.locationName+ " "+actor.name+" requires " +actor.requirements[logic]);
+    });
+    }
 }
 
 function signs (map, pm) {
@@ -941,6 +1030,17 @@ function signs (map, pm) {
 function attach (left, right, options, pm){
 	var lefttype= 0xff;
 	var righttype = 0xff;
+	if (right.lefttype && !options.leftbranch) {
+		righttype = right.lefttype;
+	}
+	if (left.righttype && !options.rightbranch){
+		lefttype = left.righttype;
+// 		console.log(left);
+// 		console.log(left.righttype);
+	}
+	
+	
+	
 	if (options.leftfc) {
 		lefttype= 0xfc;
 		
@@ -949,9 +1049,19 @@ function attach (left, right, options, pm){
 		righttype = 0xfc;
 		
 	}
+// 	console.log(righttype+ "  "+lefttype);
 	
 	
-	
+// 	log ("left type: "+lefttype + " Right type: "+righttype);
+	if (lefttype ==0xf9){
+//  			log(lefttype+" "+ right.objset+" "+right.area);
+//  			log(right);
+			
+		}
+		if (righttype ==0xf9){
+//  			log(righttype+" "+ left.objset+" "+left.area);
+//  			log(left);
+		}
 	if (options.leftbranch) {
 		pm.add([lefttype, left.objset, left.area ], right.branch.leftoffset);
 		pm.add([righttype, right.branch.objset, right.branch.area ], left.rightoffset);
@@ -966,15 +1076,16 @@ function attach (left, right, options, pm){
 		pm.add([righttype, right.objset, right.area ], left.rightbranch.rightoffset);
 		
 	}else {
-		pm.add([lefttype, right.objset, right.area ], left.rightoffset);
-		pm.add([righttype, left.objset, left.area ], right.leftoffset);
+		pm.add([lefttype, left.objset, left.area ], right.leftoffset);
+		pm.add([righttype, right.objset, right.area ], left.rightoffset);
+		
 	}
 		
 	
 	
-	if (options.noheightchange || left.heightoffset == null){
-		
-	}else {
+	if (options.noheightchange || left.heightoffsetpointer == null){
+		//log("HEIGHT ISSUE");
+	}else if (!options.leftfc && !options.rightfc) {
 		adjustheight(left.heightoffsetpointer, left.rightsubmap, left.height, right.height, pm);
 	}
 	
@@ -984,13 +1095,13 @@ function attach (left, right, options, pm){
 
 function adjustheight(heightoffsetpointer, submap, height1, height2, pm) {
 		if (!heightoffsetpointer) {
-// 			console.log("no heightoffset! Probably a problem");
+			log("no heightoffset! Probably a problem");
 			if (height1 != height2){
-// 				console.log("height problem for sure");
-				
+ 				log("height problem for sure");
 			}
 			return;
 		}
+		
 		var value=0;
 		if (height1 != height2){
 					if (height1 > height2) {
@@ -1013,9 +1124,28 @@ function adjustheight(heightoffsetpointer, submap, height1, height2, pm) {
 		//console.log("left height:" + height1+ " right height: "+height2+" value: "+value +" heightoffset: "+heightoffset);
 }
 
-
-function updatelogic(area, logic, townReqs) {
+function countlogic(logic) {
+	count=0;
+	const actors = core.reduce((a, c) => {
+					return a.concat(c.actors || []);
+				}, []);
+	actors.filter(a => a.holdsItem).forEach(actor => {
+		
+		if (actor.requirements[logic]){
+			return;
+		}else {
+			//log(actor);
+			count +=1
+			
+		}
+		
+	});
 	
+	
+	return count;
+}
+function updatelogic(area, logic, townReqs) {
+//         console.log("updating logic for "+area + " with "+townReqs);
 		const actors = core
 				.filter(loc => loc.name === area)
 				.reduce((a, c) => {
@@ -1027,7 +1157,7 @@ function updatelogic(area, logic, townReqs) {
 					actorReqs= actor.actorRequirements[logic];
 				}
 				
-				let newReqs;
+				let newReqs='';
 				if (townReqs && actorReqs) {
 					newReqs = `(${townReqs}) && (${actorReqs})`;
 				} else if (townReqs) {
@@ -1039,8 +1169,8 @@ function updatelogic(area, logic, townReqs) {
 				}
 				actor.requirements[logic] = newReqs;
 				
-// 					console.log(actor.locationName);
-// 					console.log(" now "+newReqs);
+//  					console.log(actor.locationName);
+//  					console.log(" now "+newReqs);
 				
 			});
 		
@@ -1059,7 +1189,7 @@ function updatelogic(area, logic, townReqs) {
 				}, []);
 			actors.filter(a => a.holdsItem).forEach(actor => {
 				const actorReqs = actor.actorRequirements[logic];
-				let newReqs;
+				let newReqs='';
 				if (townReqs && actorReqs) {
 					newReqs = `(${townReqs}) && (${actorReqs})`;
 				} else if (townReqs) {
@@ -1070,8 +1200,7 @@ function updatelogic(area, logic, townReqs) {
 					newReqs = '';
 				}
 				actor.requirements[logic] = newReqs;
-// 					console.log(actor.locationName);
-// 					console.log(" now "+newReqs);
+ 					
 				
 			});
 				

@@ -7,6 +7,8 @@ module.exports = {
 	id: 'enemy-hp',
 	name: 'Enemy HP Randomizer',
 	description: 'Randomize enemy HP by +/-50%',
+	//qol, random, difficulty, misc
+	type: 'random',
 	patch: function(pm, opts) {
 		const { core, utils: { randomInt } } = require('../../lib');
 		const { rng } = opts;
@@ -15,13 +17,22 @@ module.exports = {
 			if (!loc.actors) { return; }
 			const hpMap = {};
 			loc.actors.filter(a => a.enemy && !a.boss).forEach(enemy => {
-				if (!hpMap[enemy.id]) {
+				if (!hpMap[enemy.id] && enemy.name != "rock" && enemy.name != "fred") {
 					const half = Math.floor(enemy.data / 2);
 					const range = enemy.data < 2 ? [ 1, 2 ] : [ enemy.data - half, enemy.data + half ];
 					hpMap[enemy.id] = randomInt(rng, ...range);
 				}
-				enemy.data = hpMap[enemy.id];
+				if (enemy.name == "fred"){
+					const half = Math.floor(enemy.data / 2);
+					const range = enemy.data < 2 ? [ 1, 2 ] : [ enemy.data - half, enemy.data + half ];
+					enemy.data = randomInt(rng, ...range);
+					
+				}else if (enemy.name === "rock"){
+					enemy.data = 1
 
+				}else {
+					enemy.data = hpMap[enemy.id];
+				}
 				// enemy (actor) data is stored as x,y,id,hp so we offset the pointer by 3 bytes
 				// since we are only modifying hp
 				pm.add([ enemy.data ], enemy.pointer + 3);

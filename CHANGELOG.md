@@ -1,5 +1,22 @@
 # CHANGELOG
 
+## 1.8.9 kaelari 9/15/2023
+* Fixes for map rando that could cause unsolvable seeds.
+
+## 1.8.8 kaelari 4/12/23
+* Map rando bug fix for screens with starting hills. You'll now spawn on top of the hill instead of in it.
+* Map rando now removes a few tiles from the left side of the cave before rover to prevent a possible soft lock if you 
+	jump in from too high a height.
+* Penalty Reduction is now 50% of experience
+* Fix for lake being undrainable
+* Enemy-hp randomizer will no longer set all creatures the same type as ones replaced by rocks to rock hp. 
+* Enemy-hp randomizer will now randomize "Fred" seperately from the other zombies in aljiba
+* Added harder death patch
+
+## 1.8.7 kaelari 4/12/23
+* Many bug fixes related to map rando
+
+
 ## 1.8.6 Kaelari 4/2/23
 * Map rando patch
 * Blob rando patch

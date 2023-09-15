@@ -2,6 +2,8 @@ module.exports = {
 	id: 'invisible-enemies',
 	name: 'Invisible Enemies (experimental)',
 	description: 'The ULTIMATE pain, Invisible enemies - including bosses!',
+	//qol, random, difficulty, misc
+	type: 'difficulty',
 	patch: [
 		// Don't mind me, I'm just modifying some graphic tiles here.
 		{ offset: 0x021690, bytes: '00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00' },

@@ -2,6 +2,8 @@ module.exports = {
 	id: 'nomusic',
 	name: 'nomusic',
 	description: 'No Music',
+	//qol, random, difficulty, misc
+	type: 'qol',
 	patch: [
 		{
 			'offset': 0x1CD4A,

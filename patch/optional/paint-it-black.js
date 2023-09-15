@@ -2,6 +2,8 @@ module.exports = {
 	id: 'paint-it-black',
 	name: 'Paint It Black (experimental)',
 	description: 'The only thing visible in the game is Simon, enemies, stairs, and a few visual cues',
+	//qol, random, difficulty, misc
+	type: 'difficulty',
 	patch: [
 		{ offset: 0x01CAC9, bytes: '0F 16 06 0F 0F 16 06 0F 0F 0F 0F 0F 0F 00 05 0F' },
 		{ offset: 0x01CA8F, bytes: '0F 16 06 16 0F 16 06 0F 0F 16 06 0F 0F 0F 0F 0F' },

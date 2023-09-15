@@ -22,57 +22,34 @@ module.exports = {
 	id: 'door-rando',
 	name: 'Door Rando',
 	description: 'All town and mansion doors are randomized',
+	//qol, random, difficulty, misc
+	type: 'random',
 	patch: function (pm, opts) {
 		const { logic, rng } = opts;
-		const spoiler = [['door', 'location']];
-
+		
 		// get a list of all doors annd targets
 		const doors = core
 			.filter(loc => loc.doors)
 			.reduce((a, c) => a.concat(c.doors.data), [])
 			.sort((a, b) => a.pointerIndex < b.pointerIndex ? -1 : 1);
-		const targets = doors.map(d => d.target);
-
+		
 		// randomize door targets
 		log('', true);
 		log('Door Rando', true);
 		log('----------', true);
-		doors.forEach(door => {
-			const index = randomInt(rng, 0, targets.length - 1);
-			const target = targets[index];
-			targets.splice(index, 1);
-			door.newTarget = {};
-			Object.assign(door.newTarget, target);
-
-			const roomLoc = getLocation(door.newTarget);
-			spoiler.push([door.name, roomLoc.name]);
-			log(`${door.name.padEnd(30, ' ')} --> ${roomLoc.name}`);
-
-			const doorReqs = getLocation(door).doors.requirements[logic];
-			const actors = core
-				.filter(loc => loc.objset === door.newTarget.objset && loc.area === door.newTarget.area)
-				.reduce((a, c) => {
-					return a.concat(c.actors || []);
-				}, []);
-			actors.filter(a => a.holdsItem).forEach(actor => {
-				const actorReqs = actor.actorRequirements[logic];
-				let newReqs;
-				if (doorReqs && actorReqs) {
-					newReqs = `(${doorReqs}) && (${actorReqs})`;
-				} else if (doorReqs) {
-					newReqs = doorReqs;
-				} else if (actorReqs) {
-					newReqs = actorReqs;
-				} else {
-					newReqs = '';
-				}
-				actor.requirements[logic] = newReqs;
-			});
-
-			doors.forEach(door => door.target = door.newTarget);
-		});
+		var spoiler = assigndoors(rng, doors, logic);
+		
+		var checks = countlogic(logic);
+		
+		while (checks <= 3){
+			//Need to recalculate doors! not enough checks!
+			spoiler = assigndoors(rng, doors, logic);
+			checks = countlogic(logic);
+		}
+		
 		global.doorSpoiler = spoiler;
-
+		
+		
 		// create array for a location pointer table
 		let maxPointer = 0;
 		doors.forEach(door => maxPointer = maxPointer < door.pointerIndex ? door.pointerIndex : maxPointer);
@@ -146,6 +123,68 @@ module.exports = {
 		pm.add(pad(bytes, 4), 0x1D069);  // town
 		pm.add(bytes, 0x1D0F9);          // mansion
 		pm.add([0xA9, 0x00], 0x1D0FF); // mansion
-
+		
 	}
+
 };
+
+function assigndoors(rng, doors, logic) {
+	const targets = doors.map(d => d.target);
+	const spoiler = [['door', 'location']];
+	doors.forEach(door => {
+			const index = randomInt(rng, 0, targets.length - 1);
+			const target = targets[index];
+			targets.splice(index, 1);
+			door.newTarget = {};
+			Object.assign(door.newTarget, target);
+
+			const roomLoc = getLocation(door.newTarget);
+			spoiler.push([door.name, roomLoc.name]);
+			log(`${door.name.padEnd(30, ' ')} --> ${roomLoc.name}`, true);
+
+			const doorReqs = getLocation(door).doors.requirements[logic];
+			const actors = core
+				.filter(loc => loc.objset === door.newTarget.objset && loc.area === door.newTarget.area)
+				.reduce((a, c) => {
+					return a.concat(c.actors || []);
+				}, []);
+			actors.filter(a => a.holdsItem).forEach(actor => {
+				const actorReqs = actor.actorRequirements[logic];
+				let newReqs;
+				if (doorReqs && actorReqs) {
+					newReqs = `(${doorReqs}) && (${actorReqs})`;
+				} else if (doorReqs) {
+					newReqs = doorReqs;
+				} else if (actorReqs) {
+					newReqs = actorReqs;
+				} else {
+					newReqs = '';
+				}
+				actor.requirements[logic] = newReqs;
+			});
+
+			doors.forEach(door => door.target = door.newTarget);
+		});
+	return spoiler
+}
+
+function countlogic(logic) {
+	count=0;
+	const actors = core.reduce((a, c) => {
+					return a.concat(c.actors || []);
+				}, []);
+	actors.filter(a => a.holdsItem).forEach(actor => {
+		
+		if (actor.requirements[logic]){
+			return;
+		}else {
+			
+			count +=1
+			
+		}
+		
+	});
+	
+	
+	return count;
+}
