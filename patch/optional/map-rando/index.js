@@ -441,6 +441,7 @@ module.exports = {
 	conflicts: 'Town-rando',
 	//qol, random, difficulty, misc
 	type: 'random',
+    character: 'm',
 	patch: function (pm, opts) {
 		const { logic, rng } = opts;
 		
@@ -735,14 +736,13 @@ module.exports = {
 		
 		leftareas= keys.filter(a=> areas[a].mustbeleft === true);
 		z = 0;
-		//console.log(leftareas);
+		console.log(leftareas);
 		//console.log(keys);
 		
 		while (leftareas.length > z){
 			
-			const position = randomInt(rng, 0, sizeofleft-leftareas.length);
+			const position = randomInt(rng, 0, sizeofleft-leftareas.length-1);
 			keys.splice(position, 0, keys.splice(keys.indexOf(leftareas[z]), 1)[0]);	
-			//console.log("moving "+leftareas[z]+" "+position);
 			z++;
 		}
 		

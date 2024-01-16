@@ -1,5 +1,17 @@
 # CHANGELOG
 
+## 1.8.10 kaelari 1/16/24
+* Added better-subweapons patch
+* Added harder-camilla patch
+* Added hide-flags patch
+* Added easier sequence break patch
+* Flags are now shown on the opening screen(one letter per patch each optional patch has a letter defined for it)
+* Added kaelari to the opening screen credits
+* Fixed a bug that could cause jova to be right of the swamp with map rando on.
+* Fixed a bug that miscounted kills from subweapons
+
+
+
 ## 1.8.9 kaelari 9/15/2023
 * Fixes for map rando that could cause unsolvable seeds.
 

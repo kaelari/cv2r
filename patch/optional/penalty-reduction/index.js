@@ -8,6 +8,7 @@ module.exports = {
 	description: 'Keep half your hearts after game over',
 	//qol, random, difficulty, misc
 	type: 'difficulty',
+    character: 'O',
 	patch: function (pm) {
 		const result = modSubroutine(pm.name, path.join(__dirname, 'pr.asm'), bank[3]);
 		const result2 = modSubroutine(pm.name, path.join(__dirname, 'pr2.asm'), bank[3]);

@@ -13,6 +13,7 @@ module.exports = {
 	description: 'blob goes to random town or mansion',
 	//qol, random, difficulty, misc
 	type: 'random',
+    character: '2',
 	patch: function (pm, opts) {
 		const { logic, rng } = opts;
 		let areas= core.filter(c => c.blobdest == 1);

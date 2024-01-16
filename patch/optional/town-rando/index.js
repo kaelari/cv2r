@@ -327,6 +327,7 @@ module.exports = {
 	conflicts: 'Map-rando',
 	//qol, random, difficulty, misc
 	type: 'random',
+    character: 'T',
 	patch: function (pm, opts) {
 	
 		const { logic, rng } = opts;

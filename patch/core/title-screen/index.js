@@ -50,9 +50,31 @@ module.exports = {
 		// It's important that the exact number of characters in the following strings are used.
 		titlePrint('  randomizer  ', 0x01041E);
 		titlePrint(titlePad(`v${version}`, 13), 0x010169);
-		titlePrint('                        ', 0x010179);
-		titlePrint('           ', 0x010194);
-		titlePrint('  by bloodsweatandcode  ', 0x0101A2);
+        if (patchGroup.string.length) {
+            var string = patchGroup.string;
+            let sortString = (stringg) => {
+                    return stringg.split("").sort().join("");
+                };
+            string = sortString(string.toLowerCase());
+            if (string === sortString("1eghopt".toLowerCase() ) ){
+                string = "Tournament";
+            }
+            if (string === sortString("1OPQegh".toLowerCase() )){
+                string = "Standard";
+            }
+            
+            if (string.length> 24){
+                
+                string = string.slice(0, 24);
+            }
+            titlePrint(titlePad(string, 24), 0x010179);
+            
+        }else {
+            titlePrint('                        ', 0x010179);
+        }
+		
+		titlePrint('  Kaelari  ', 0x010194);
+		titlePrint('    bloodsweatandcode   ', 0x0101A2);
 
 		// prevent selecting "password"
 		titlePrint('        ', 0x13A2D);

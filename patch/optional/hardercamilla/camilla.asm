@@ -1,0 +1,32 @@
+LDA $50
+CMP #$6
+BNE END
+LDA $30
+CMP #$01
+BNE END
+CPY #$30
+BEQ NOTHING
+LDA #$32
+STA $5
+RTS 
+
+NOTHING
+INC $6200;
+LDA $6200
+CMP #$01
+BEQ nofireball
+LDA #00
+STA $6200
+LDA #$32
+STA $5
+RTS 
+
+nofireball
+LDA #00
+STA $5
+RTS
+
+END
+LDA #$30
+STA $5
+RTS

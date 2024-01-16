@@ -13,6 +13,7 @@ module.exports = {
 	description: 'Tornado goes to random place. If used with map rando may require glitches to complete.',
 	//qol, random, difficulty, misc
 	type: 'random',
+    character: 'Z',
 	patch: function (pm, opts) {
 		const { logic, rng } = opts;
 		let areas= core.filter(c => c.tornadodest == 1);

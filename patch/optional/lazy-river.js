@@ -13,6 +13,7 @@ module.exports = {
 	description: 'Only spawn fishmen on Dead River, like vanilla CV2',
 	//qol, random, difficulty, misc
 	type: 'difficulty',
+    character: 'l',
 	patch: function(pm) {
 		const { core } = require('../../lib');
 		const deadRiverLocs = [

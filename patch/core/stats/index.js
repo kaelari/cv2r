@@ -14,6 +14,11 @@ module.exports = {
 				romLoc: 0x4937
 			}
 		});
+        modSubroutine(pm.name, path.join(__dirname, 'asm', 'kills2.asm'), bank[1], {
+			invoke: {
+				romLoc: 0x4A78
+			}
+		});
 
 		modSubroutine(pm.name, path.join(__dirname, 'asm', 'hearts.asm'), bank[1], {
 			invoke: {

@@ -12,6 +12,7 @@ module.exports = {
 	description: 'Replaces "duck" merchant with an actual duck',
 	//qol, random, difficulty, misc
 	type: 'qol',
+    character: 'g',
 	patch: function(pm) {
 		const graveyard = core.find(loc => loc.objset === 3 && loc.area === 1 && loc.submap === 0);
 		const spriteTable = graveyard.pattern.value & 0x0F;

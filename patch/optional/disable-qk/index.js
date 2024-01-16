@@ -7,6 +7,7 @@ module.exports = {
 	description: 'Disable the vanilla CV2 bug where the last frame of a subweapon does 185 damage, most often used to quick kill Death and Dracula.',
 	//qol, random, difficulty, misc
 	type: 'difficulty',
+    character: 'd',
 	patch: function(pm) {
 		modSubroutine(pm.name, path.join(__dirname, 'disable-qk.asm'), bank[1], {
 			invoke: {

@@ -30,6 +30,7 @@ module.exports = {
 	description: 'Randomize Enemies',
 	//qol, random, difficulty, misc
 	type: 'random',
+    character: 'e',
 	patch: async function(pm, opts) {
 	
 		const { rng } = opts;

@@ -9,6 +9,7 @@ module.exports = {
 	description: 'Randomize enemy HP by +/-50%',
 	//qol, random, difficulty, misc
 	type: 'random',
+    character: 'h',
 	patch: function(pm, opts) {
 		const { core, utils: { randomInt } } = require('../../lib');
 		const { rng } = opts;

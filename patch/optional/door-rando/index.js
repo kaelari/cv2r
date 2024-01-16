@@ -24,6 +24,7 @@ module.exports = {
 	description: 'All town and mansion doors are randomized',
 	//qol, random, difficulty, misc
 	type: 'random',
+    character: '4',
 	patch: function (pm, opts) {
 		const { logic, rng } = opts;
 		

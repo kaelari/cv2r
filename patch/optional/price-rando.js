@@ -6,6 +6,7 @@ module.exports = {
 	description: 'Randomize merchant prices by +/-25%',
 	//qol, random, difficulty, misc
 	type: 'random',
+    character: 'P',
 	patch: function(pm, opts) {
 		const { core, utils: { randomDecimal } } = require('../../lib');
 		const { rng } = opts;

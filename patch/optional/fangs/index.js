@@ -7,6 +7,7 @@ module.exports = {
 	description: 'Adds Dracula\'s Fangs as a collectable item. Instantly gives you 5 lives. After every continue you will also start with 5 lives.',
 	//qol, random, difficulty, misc
 	type: 'random',
+    character: 'f',
 	patch: function (pm) {
 		modSubroutine(pm.name, path.join(__dirname, 'fangs.asm'), bank[0], {
 			invoke: {

@@ -4,6 +4,7 @@ module.exports = {
 	description: 'A heart drops on every single enemy kill',
 	//qol, random, difficulty, misc
 	type: 'difficulty',
+    character: '1',
 	patch: [
 		{ offset: 0x42B9, bytes: [ 0xB0 ] }
 	]

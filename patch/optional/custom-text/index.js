@@ -25,6 +25,7 @@ module.exports = {
 	description: 'All the dialog is now a little more fun in CV2R',
 	//qol, random, difficulty, misc
 	type: 'qol',
+    character: 'Q',
 	patch: async function(pm, { rng }) {
 		// load original text pointers
 		const textPointers = [];
