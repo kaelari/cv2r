@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## 1.8.11 kaelari 3/16/24
+* Fixed a bug with harder camilla
+
 ## 1.8.10 kaelari 1/16/24
 * Added better-subweapons patch
 * Added harder-camilla patch

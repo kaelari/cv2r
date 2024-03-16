@@ -736,7 +736,7 @@ module.exports = {
 		
 		leftareas= keys.filter(a=> areas[a].mustbeleft === true);
 		z = 0;
-		console.log(leftareas);
+		//console.log(leftareas);
 		//console.log(keys);
 		
 		while (leftareas.length > z){

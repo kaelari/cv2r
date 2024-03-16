@@ -6,7 +6,10 @@ CMP #$01
 BNE ENDprojectile
 LDA $51
 CMP #$02
+BEQ camprojectile
+CMP #$82
 BNE ENDprojectile
+camprojectile
 LDA #$6
 LDY #$0
 LSR A
