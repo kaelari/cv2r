@@ -129,8 +129,32 @@ JSR $${loc.ram.toString(16)}
 `;
 			});
 		}else {
+            
 			const file = path.join(__dirname, 'asm', 'whip.asm');
-			const loc = modSubroutine(pm.name, file, bank[bankIndex]);
+            var levelup="";
+            
+            
+                if (global.pacifist === 1) {
+                    
+                    levelup = `INC $8B
+LDA $8b
+AND #$1
+BNE heal
+LDA #$16
+ADC $81
+STA $81
+
+heal
+LDA $81
+STA $80
+`;
+                }
+			const loc = modSubroutine(pm.name, file, bank[bankIndex], {
+                values: {
+                    levelup: levelup
+                    
+                }
+            });
 			whips.forEach(whip => {
 			whip.bankCode[bankIndex] = `
 JSR $${loc.ram.toString(16)}

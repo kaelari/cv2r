@@ -1,5 +1,5 @@
-const { core, utils: { randomInt } } = require('../../lib');
-
+const { bank, core, utils: { randomInt, modSubroutine } } = require('../../lib');
+const path = require('path');
 const { log } = require('../../lib/utils');
 
 
@@ -23,7 +23,13 @@ module.exports = {
 		const tornadooffset = 0xAE8C;
 		const tornadodestobjset = [areas[index].objset];
 		pm.add(tornadovalue, tornadooffset);
+        
 		pm.add(tornadodestobjset, 0x1d092);
+        modSubroutine(pm.name, path.join(__dirname, 'town-rando/tornado.asm'), bank[7], {invoke: {
+                    romLoc: 0x1d09f
+                    } 
+                    
+                } );
 // 		console.log("tornado to: " + areas[index].name);
 		
 	}

@@ -30,7 +30,7 @@ STA *$57
 LDA #$1D
 STA *$5D
 
-LDA #$8F
+LDA #$B0
 ; simon_y_pos
 STA $324
 ; jovah_warp_flag

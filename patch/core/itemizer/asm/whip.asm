@@ -56,6 +56,8 @@ BCC NOMARK
 MARK STA $600E
 
 NOMARK INC $434
+<%= levelup %>
+
 
 DONE
 PLA

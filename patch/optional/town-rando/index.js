@@ -1,5 +1,5 @@
-const { core, utils: { shuffleArray} } = require('../../../lib');
-
+const { bank, core, utils: { shuffleArray, modSubroutine} } = require('../../../lib');
+const path = require('path');
 const { log } = require('../../../lib/utils');
 const townamap =[	
 0x00, 0x00, 0x04, 0x26, 0x38, 0x14, 0x13, 0x42, 
@@ -284,7 +284,12 @@ function copytown (town1, town2, pm, logic){
 			pm.add(towns[town2].fromrightvalue, towns[town1].tornadooffset);
 			if (towns[town2].town){
 				pm.add([0x00], towns[town1].tornadodestobjsetoffset);
-				
+				modSubroutine(pm.name, path.join(__dirname, 'tornado.asm'), bank[7], {invoke: {
+                    romLoc: 0x1d09f
+                    } 
+                    
+                } );
+		
 			}else {
 				
 				pm.add([0x01], towns[town1].tornadodestobjsetoffset);

@@ -82,6 +82,7 @@ module.exports = {
 					text = actor.text.replace(/\n/g, " ");
 					
 				}else {
+                    
 					text = _.template(rawText)(itemArticles(item));
 				}
 				const mod = modText(pm.name, prepText(text, actor.name), bank[3]);

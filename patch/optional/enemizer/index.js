@@ -103,8 +103,10 @@ module.exports = {
 
 			// change enemies for the location based on the pattern table value
 			let enemies;
+            let enemiesforced;
 			if (forceEnemy) {
 				enemies = object.enemies.filter(e => e.id === parseInt(forceEnemy, 16));
+                enemiesforced = object.enemies.filter(e => e.id === parseInt(forceEnemy, 16));
 			} else {
 				enemies = object.enemiesBySpritePattern(spritePattern, { exclude });
 			}
@@ -135,7 +137,12 @@ module.exports = {
 				}
 				// hey look, a new enemy!
 				const len = filteredEnemies.length;
-				const newEnemy = filteredEnemies[randomInt(rng, 0, len - 1)];
+                let newEnemy;
+                if (len == 0){
+                    newEnemy = enemiesforced[0];
+                }else {
+                    newEnemy = filteredEnemies[randomInt(rng, 0, len - 1)];
+                }
 				a.id = newEnemy.id;
 
 				// try to stop spiders from killing themsevles below the screen

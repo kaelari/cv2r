@@ -1,5 +1,17 @@
 # CHANGELOG
 
+## 1.8.12
+* fixed a bug with map rando not generating properly
+* simon on warping back to jova will no longer fall a short distance.
+* fixed a bug that could cause the screen to not scroll after jumping into a town
+* Pressing B with the menu open will deselect both subweapon and quest item
+* added no-price patch which makes everything free
+* added pacifist patch which warps you back to jova if you kill an enemy
+* multiple bug fixes with forcing an enemy
+* enemies that can be in certain positions when the enemy is forced to that enemy will now spawn in that location rather than crash the randomizer.
+
+
+
 ## 1.8.11 kaelari 3/16/24
 * Fixed a bug with harder camilla
 

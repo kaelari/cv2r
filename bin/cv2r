@@ -191,6 +191,10 @@ async function main() {
 		if (program.debug && !program.json) {
 			global.debug = program.showSpoilers ? 'spoiler' : true;
 		}
+		if (program.debug && program.json){
+            global.silentdebug = 1;
+		}
+		
 		if (program.customjson){
 			program.customlogic = require(program.customjson);
 		}

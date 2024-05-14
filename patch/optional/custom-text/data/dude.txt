@@ -11,3 +11,4 @@ Chain letter said to give <%= indef %><%= item %> to 5 friends
 I expect <%= dem %><%= item %> back soon
 Cursed huh? Maybe <%= dem %><%= item %> will help.
 Down with the sickness? Try <%= dem %><%= item %>
+Kael just added <%=dem %><%= item %>

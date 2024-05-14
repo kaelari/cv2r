@@ -465,21 +465,40 @@ module.exports = {
 		//we grab a town or mansion to be right of camilla cemetery for tornado to not derp.
 		townsmansion = keys.filter( a => areas[a].objset === 1 || areas[a].objset === 0);
 		shuffleArray(townsmansion, rng);
-		reservedtown = keys.splice(keys.indexOf(townsmansion[0]), 1);
-		if (reservedtown == "jova"){
+		
+        
+        
+        
+        
+        
+        
+        reservedtown = keys.splice(keys.indexOf(townsmansion[0]), 1);
+        
+        
+		
+        if (reservedtown[0] == "jova"){
+            townsmansion.splice(0,1);
 			reservedtown = keys.splice(keys.indexOf(townsmansion[0]), 1);
 			keys.unshift("jova");
 		}
-			
+		
+        
+        
+		 
+        
+        
 		//debious woods always goes first so it's in the first left branch
 		keys.splice(0, 0, keys.splice(keys.indexOf("debiouswoods"), 1)[0]);	
 		
+        
 		
 		branches = keys.filter(a => areas[a].branch != null);
 		
+        
 		j=0;
 		
 		while (j< branches.length){
+                
 				//we go the other way through a branch and connect to a leftcap
 				//or we start from a new leftcap and go to this cap
 				var branchreqs = '';
@@ -557,6 +576,8 @@ module.exports = {
 			var left = leftcap[leftcaps[0]];
 			leftbranches[j].push(leftcaps[0]);
 			leftcaps.splice(0, 1);
+            
+            
 			if (last2.branch){
 				attach(left, last2, {leftbranch:true, rightfc: true}, pm);		
 			}else {
@@ -810,7 +831,7 @@ module.exports = {
 		}
 		last = midcap;
 		var tornado = null;
-		keys.unshift(reservedtown);
+		keys.unshift(reservedtown[0]);
 		//console.log("part b, post tornado");
 		while (keys.length>0) {
 			
@@ -899,8 +920,15 @@ module.exports = {
 		const tornadovalue= [0xFF, tornado.objset, tornado.area];
 		const tornadooffset = 0xAE8C;
 		const tornadodestobjset = [tornado.objset];
+        
 		pm.add(tornadovalue, tornadooffset);
 		pm.add(tornadodestobjset, 0x1d092);
+        
+        modSubroutine(pm.name, path.join(__dirname, '../town-rando/tornado.asm'), bank[7], {invoke: {
+                    romLoc: 0x1d09f
+                    } 
+                    
+                } );
  		//console.log(map.join("->"));
 		signs(map, pm);
 		leftbranches.forEach( branch => {

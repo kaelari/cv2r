@@ -1,10 +1,14 @@
+LDA $6090
+CMP #01
+BEQ UNPAUS
+
 ; inventory game state
 LDA *$26
 CMP #$01
 BNE JWARP
 ; quest items selected in inventory
-LDA *$33
-BNE DONE
+;LDA *$33
+;BNE DONE
 
 ; b pressed
 LDA *$F1
@@ -13,6 +17,7 @@ BNE DONE
 ; deselect quest item
 LDA #$00
 STA *$4F
+STA *$90
 BEQ DONE
 
 ; select pause game state
@@ -93,6 +98,7 @@ DOJW
 LDA #$0D
 STA $600B
 LDA #$00
+STA $6090
 STA *$30
 STA *$50
 STA *$51

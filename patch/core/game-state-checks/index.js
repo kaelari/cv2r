@@ -5,7 +5,7 @@ module.exports = {
 	patch: function (pm) {
 		// subroutine to handle jovah warp and inventory quest item deselect code
 		var down = "UPGRAD RTS";
-		if (global.debug) {
+		if (global.debug || global.silentdebug) {
 			down = `UPGRAD LDA #$04
 STA $0434
 LDA #$FF

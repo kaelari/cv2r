@@ -10,3 +10,4 @@ Take <%= def %><%= item %> but you're paying for that orb!
 Who even put <%= dem %><%= item %> in here?
 Thou hast acquired <%= def %><%= item %>
 Damn son, there's <%= indef %><%= item %> in here!
+Xytoriak didn't have a stake leaving <%= indef %> <%= item %>
