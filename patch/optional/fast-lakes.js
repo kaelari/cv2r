@@ -1,7 +1,7 @@
 module.exports = {
 	id: 'fast-lakes',
 	name: 'Fast Lake Scrolls',
-	description: 'Open lakes right away if you have Blue Crystal+, you don\'t even need to to equip it!',
+	description: 'Open lakes right away if you have Blue Crystal+, you don\'t even need to equip it!',
 	//qol, random, difficulty, misc
 	type: 'qol',
     character: '1',
