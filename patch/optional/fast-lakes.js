@@ -14,7 +14,7 @@ module.exports = {
 			0xEA,			//nop
 			0xEA,			//nop
 			0xEA,			//nop
-			0xA5, 0x91,		//lda $91 (InventoryBosyParts1)
+			0xA5, 0x91,		//lda $91 (InventoryBodyParts1)
 			0x29, 0x60,		//and #$60
 			0xC9, 0x40,		//cmp #$40
 			0x90, 0x1C,		//bcc ($A7B7)
