@@ -268,6 +268,7 @@ async function main() {
 		outputLog(`* patch:        ${cyan(output.patch)}`);
 		outputLog(`* item spoiler: ${cyan(output.spoiler)}`);
 		outputLog(`* door spoiler: ${cyan(output.doorSpoiler)}`);
+		outputLog(`* town spoiler: ${cyan(output.townSpoiler)}`);
 		if (opts.multiworld) {
 			var world;
 			if (!opts.world) {
