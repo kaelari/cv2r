@@ -1,0 +1,4 @@
+STA $03BA
+LDA #$FF
+STA $04C8
+RTS

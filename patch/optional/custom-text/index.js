@@ -26,6 +26,7 @@ module.exports = {
 	//qol, random, difficulty, misc
 	type: 'qol',
     character: 'Q',
+	conflicts: 'bridge-rando',
 	patch: async function(pm, { rng }) {
 		// load original text pointers
 		const textPointers = [];
@@ -71,6 +72,9 @@ module.exports = {
 			if (!loc.actors) { return; }
 			loc.actors.forEach(actor => {
 				if (!actor.textPointer) { return; }
+				
+				
+				if (actor.dontChange){ console.log("RETURNING");return; }
 				const textKey = actorMap[actor.name];
 				if (!textKey) { return; }
 				const index = randomInt(rng, 0, newText[textKey].length - 1);

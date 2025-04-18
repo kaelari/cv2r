@@ -1,6 +1,6 @@
 const fs = require('fs').promises;
 const path = require('path');
-const { assemble, core, object, utils: { randomInt }} = require('../../../lib');
+const { assemble, core, object, utils: { randomInt, log }} = require('../../../lib');
 
 const PATTERN_ASM = path.join(__dirname, 'pattern.asm');
 
@@ -52,8 +52,20 @@ module.exports = {
 
 			// don't enemize town or castlevania actors
 			if ([ 0x00, 0x05 ].includes(loc.objset) || loc.boss) {
-				loc.pattern = {
-					value: ptv(0, loc.death ? 0x09 : spritePatternMap[loc.objset]),
+                    value = 0;
+                    if (loc.death) {
+                        value = 0x9;
+                        log ("death sprites");
+                    }else if (loc.camilla){
+                        value = 0xA;
+                        log("camilla sprites");
+                    }else if (loc.drac){
+                        value =  0x0c; // no clue if this is right
+                        log("drac sprites");
+                    }
+                loc.pattern = {
+                   
+					value: ptv(0, value ? value : spritePatternMap[loc.objset]),
 					pointer: BASE_LOC_PTR + offset
 				};
 				return;
@@ -147,7 +159,8 @@ module.exports = {
 
 				// try to stop spiders from killing themsevles below the screen
 				if (newEnemy.name === 'spider' && a.pos !== object.POS_AIR) {
-					a.y = randomInt(rng, a.y - 8, a.y - 6);
+					a.y = Math.max(0, randomInt(rng, a.y - 8, a.y - 6));
+                    
 
 				// if the enemy we're replacing is positioned at the bottom...
 				} else if (a.pos === object.POS_BELOW) {
@@ -212,16 +225,19 @@ module.exports = {
 		// update pattern tables for all locations in patch
 		core.forEach(loc => {
 			if (loc.pattern && loc.pattern.value != null && loc.pattern.pointer) {
-				pm.add([ loc.pattern.value ], loc.pattern.pointer);
+                
+                pm.add([ loc.pattern.value ], loc.pattern.pointer);
+                //console.log(loc.name, loc.pattern);
 			}
 		});
 
 		// jump to subroutine that handles pattern table mapping
 		let buf = Buffer.concat([Buffer.from([ 0x20, 0x50, 0xB8 ]), Buffer.alloc(17, 0xEA)]);
+        
 		pm.add([...buf], 0x1CCDF);
 
 		// write code for mapping pattern table ids to each screen
 		buf = Buffer.from(assemble(await fs.readFile(PATTERN_ASM, 'utf8')));
-		pm.add([...buf], 0x7860);
+        pm.add([...buf], 0x7860);
 	}
 };

@@ -1,0 +1,37 @@
+[
+	{ "name": "Laruba Mansion - Orb Room",
+		"actors": [
+			{"cantHave": "dagger || silver knife || flame whip ||gold knife ||garlic || laurels || morning star|| thorn whip|| chain whip|| diamond|| sacred flame|| oak stake||holy water||magic cross||silk bag"}
+		]
+	},
+	{
+		"name": "Brahm Mansion - Orb Room",
+		"actors": [
+			{"cantHave": "dagger || silver knife || flame whip ||gold knife ||garlic || laurels || morning star|| thorn whip|| chain whip|| diamond|| sacred flame|| oak stake||holy water||magic cross||silk bag"}
+		]
+	},
+	{
+		"name": "Berkeley Mansion - Part 2",
+		"actors": [
+			{},
+			{"cantHave": "dagger || silver knife || flame whip ||gold knife ||garlic || laurels || morning star|| thorn whip|| chain whip|| diamond|| sacred flame|| oak stake||holy water||magic cross||silk bag"}
+		]
+	},
+	{
+		"name": "Rover Mansion - Part 2",
+		"actors": [
+			{},
+			{"cantHave": "dagger || silver knife || flame whip ||gold knife ||garlic || laurels || morning star|| thorn whip|| chain whip|| diamond|| sacred flame|| oak stake||holy water||magic cross||silk bag"}
+		]
+	},
+	{
+		"name": "Bodley Mansion - Part 2",
+		"actors": [
+			{},
+			{"cantHave": "dagger || silver knife || flame whip ||gold knife ||garlic || laurels || morning star|| thorn whip|| chain whip|| diamond|| sacred flame|| oak stake||holy water||magic cross||silk bag"}
+		]
+	}
+	
+]
+
+

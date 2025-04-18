@@ -8,13 +8,13 @@
 	{
 		"name": "Jova - Thorn Whip Room",
 		"actors": [
-			{"mustHave": "laurels"}
+			{"mustHave": "chain whip"}
 		]
 	},
 	{
 		"name": "Jova - Holy Water Room",
 		"actors": [
-			{"mustHave": "oak stake"}
+			{"mustHave": "flame whip"}
 		]
 	}
 	

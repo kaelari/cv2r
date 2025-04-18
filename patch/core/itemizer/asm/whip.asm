@@ -55,7 +55,11 @@ CMP #$38
 BCC NOMARK
 MARK STA $600E
 
-NOMARK INC $434
+NOMARK LDA $434
+CMP #$04    
+BCS SKIP    
+INC $434    
+SKIP
 <%= levelup %>
 
 

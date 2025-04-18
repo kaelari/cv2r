@@ -8,13 +8,13 @@
 	{
 		"name": "Jova - Thorn Whip Room",
 		"actors": [
-			{"mustHave": "blue crystal"}
+			{"mustHave": "silk bag"}
 		]
 	},
 	{
 		"name": "Jova - Holy Water Room",
 		"actors": [
-			{"mustHave": "red crystal"}
+			{"mustHave": "silver knife"}
 		]
 	},
 	{
@@ -44,7 +44,7 @@
 	{
 		"name": "Aljiba",
 		"actors": [
-			{"mustHave": "dagger"}
+			{"mustHave": "red crystal"}
 		]
 	},
 	{
@@ -56,7 +56,7 @@
 	{
 		"name": "Alba",
 		"actors": [
-			{"mustHave": "silk bag"}
+			{"mustHave": "blue crystal"}
 		]
 	},
 	{
@@ -107,21 +107,15 @@
 		"name": "Berkeley Mansion - Part 2",
 		"actors": [
 			{"mustHave": "eyeball"},
-			{"mustHave": "nail"}
+			{"mustHave": "oak stake"}
 		]
 	},
-	{
-		"name": "Berkeley Mansion - Part 2",
-		"actors": [
-			{"mustHave": "eyeball"},
-			{"mustHave": "nail"}
-		]
-	},
+	
 	{
 		"name": "Rover Mansion - Part 2",
 		"actors": [
 			{"mustHave": "ring"},
-			{"mustHave": "oak stake"}
+			{"mustHave": "nail"}
 		]
 	},
 	{
@@ -152,7 +146,7 @@
 	{
 		"name": "Bodley Mansion - Part 2",
 		"actors": [
-			{"mustHave": "silver knife"},
+			{"mustHave": "dagger"},
 			{"mustHave": "flame whip"}
 		]
 	},

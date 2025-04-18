@@ -334,13 +334,14 @@ module.exports = {
 	type: 'random',
     character: 'T',
 	patch: function (pm, opts) {
-	
+        var spoiler = [];
 		const { logic, rng } = opts;
 		var attempts = 0;
 		while (1){
 			const townnames = ["Jova",'Rover Mansion - Door',"Yomi","Veros", "Doina", 'Brahm Mansion - Door', 'Laruba Mansion - Door',"Berkeley Mansion - Door", "Alba", "Ondol", "Aljiba", 'Bodley Mansion - Door'];
 			const townnames2 =  ["Jova", "Alba", "Ondol", "Aljiba", "Doina", 'Brahm Mansion - Door', "Yomi", "Veros", "Berkeley Mansion - Door", 'Laruba Mansion - Door','Bodley Mansion - Door','Rover Mansion - Door'];
 			attempts = 0;
+            spoiler = [['town/mansion', 'maplocation']];
 			shuffleArray(townnames, rng);
 			shuffleArray(townnames2, rng);
 			while (townnames.length > 0 && attempts <20){
@@ -367,7 +368,8 @@ module.exports = {
 					
 					}
 					copytown(townnames2[j], townnames[0], pm, logic);
-					townnames.shift();
+					spoiler.push( [townnames[0], townnames2[j]] );
+                    townnames.shift();
 					townnames2.splice(j, 1);
 					break;
 				}
@@ -379,6 +381,7 @@ module.exports = {
 			}
 			log("looping");
 		}
+		global.townSpoiler = spoiler;
 		newrover = towns['Rover Mansion - Door'].replacedby;
 		//build wall in new rover
 		if (newrover === 'Rover Mansion - Door'){ 

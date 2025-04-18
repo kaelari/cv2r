@@ -1,6 +1,6 @@
 {
     "name": "cv2r",
-    "version": "1.8.12",
+    "version": "1.8.13B4",
     "description": "Castlevania II: Simon's Quest Randomizer",
     "main": "lib/index.js",
     "bin": {

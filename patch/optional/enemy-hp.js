@@ -4,7 +4,9 @@
 // if the first skeleton on a screen has its hp randomized to 3 hp, all skeletons on the
 // same screen will have 3 hp.
 module.exports = {
-	id: 'enemy-hp',
+	pre: true,
+	order: 110,
+    id: 'enemy-hp',
 	name: 'Enemy HP Randomizer',
 	description: 'Randomize enemy HP by +/-50%',
 	//qol, random, difficulty, misc

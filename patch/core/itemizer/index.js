@@ -57,8 +57,8 @@ function randomize(rng, { logic }) {
 		});
 	});
 	Object.keys(counts).forEach(key => countsSorted.push({ name: key, value: counts[key] }));
-	const itemDeps = countsSorted.sort((a, b) => a.value < b.value).map(c => c.name);
-
+	const itemDeps = countsSorted.sort((a, b) => b.value - a.value || a.name.localeCompare(b.name))
+        .map(c => c.name);
 	// Make a list of all items to be randomized. Whips are not specified by name
 	// as they are updated progressively. Same goes for crystals, though they have
 	// item dependencies, so their order and adherence to dependencies still needs to be
@@ -128,6 +128,11 @@ const clone = () => Object.assign({}, visited);
 			choices = actors.filter(actor => {
 				if (actor.newItem) { return false; }
 				if (actor.mustHave != null && actor.mustHave != item) {return false;}
+				if (actor.cantHave != null) {
+                    if (actor.cantHave.toLowerCase().includes(item.toLowerCase() ) ){
+                        return false;
+                    }
+                }
 				if (actor.name === "merchant" && item === "clue"){return false;}
 				if (!isDep) { return true; }
 				if (actor.requirements[logic] === '') { return true; }
@@ -140,7 +145,7 @@ const clone = () => Object.assign({}, visited);
 			
 			throw new Error(`cannot find free actor for ${item}`);
 		}
-
+        
 		// choose a random actor in `choices` subset and assign the item to it
 		const choiceIndex = randomInt(rng, 0, choices.length - 1);
 		const choice = choices[choiceIndex];
@@ -273,11 +278,18 @@ module.exports = {
 			})
 		}else {
 		// randomize game items amongst all available actors. Retry if necessary.
-			function wrapper() {
+			errors = 0;
+            function wrapper() {
+                
 				try {
 					randomize(rng, opts);
 				} catch (err) {
 					if (err.message.includes('cannot find free actor')) {
+                        errors += 1;
+                        
+                        if (errors >= 100){
+                            throw new Error("couldn't place items after 100 attempts");
+                        }
 						wrapper();
 					} else {
 						throw err;

@@ -1,0 +1,184 @@
+[
+	{
+		"name": "Jova",
+		"actors": [
+			{"cantHave": "RING && EYEBALL && RIB && HEART && NAIL"}
+		]
+	},
+	{
+		"name": "Jova - Thorn Whip Room",
+		"actors": [
+			{"cantHave": "RING && EYEBALL && RIB && HEART && NAIL"}
+		]
+	},
+	{
+		"name": "Jova - Holy Water Room",
+		"actors": [
+			{"cantHave": "RING && EYEBALL && RIB && HEART && NAIL"}
+		]
+	},
+	
+	{ "name": "Laruba Mansion - Orb Room",
+		"actors": [
+			{"cantHave": "dagger || silver knife || flame whip ||gold knife ||garlic || laurels || morning star|| thorn whip|| chain whip|| diamond|| sacred flame|| oak stake||holy water||magic cross||silk bag||white crystal|| blue crystal||red crystal||fangs"}
+		]
+	},
+	{
+		"name": "Brahm Mansion - Orb Room",
+		"actors": [
+			{"cantHave": "dagger || silver knife || flame whip ||gold knife ||garlic || laurels || morning star|| thorn whip|| chain whip|| diamond|| sacred flame|| oak stake||holy water||magic cross||silk bag||white crystal|| blue crystal||red crystal||fangs"}
+		]
+	},
+	{
+		"name": "Veros - Dagger Room",
+		"actors": [
+			{"cantHave": "RING && EYEBALL && RIB && HEART && NAIL"}
+		]
+	},
+	{
+		"name": "Veros - Chain Whip Room",
+		"actors": [
+			{"cantHave": "RING && EYEBALL && RIB && HEART && NAIL"}
+		]
+	},
+	{
+		"name": "Aljiba - Garlic Room",
+		"actors": [
+			{"cantHave": "RING && EYEBALL && RIB && HEART && NAIL"}
+		]
+	},
+	{
+		"name": "Aljiba - Laurels Room",
+		"actors": [
+			{"cantHave": "RING && EYEBALL && RIB && HEART && NAIL"}
+		]
+	},
+	{
+		"name": "Aljiba",
+		"actors": [
+			{"cantHave": "RING && EYEBALL && RIB && HEART && NAIL"}
+		]
+	},
+	{
+		"name": "Camilla Cemetery",
+		"actors": [
+			{"cantHave": "RING && EYEBALL && RIB && HEART && NAIL"}
+		]
+	},
+	{
+		"name": "Alba",
+		"actors": [
+			{"cantHave": "RING && EYEBALL && RIB && HEART && NAIL"}
+		]
+	},
+	{
+		"name": "Alba - Garlic Room",
+		"actors": [
+			{"cantHave": "RING && EYEBALL && RIB && HEART && NAIL"}
+		]
+	},
+	{
+		"name": "Alba - Laurels Room",
+		"actors": [
+			{"cantHave": "RING && EYEBALL && RIB && HEART && NAIL"}
+		]
+	},
+	{
+		"name": "Ondol - Morning Star Room",
+		"actors": [
+			{"cantHave": "RING && EYEBALL && RIB && HEART && NAIL"}
+		]
+	},
+	{
+		"name": "Ondol - Laurels Room",
+		"actors": [
+			{"cantHave": "RING && EYEBALL && RIB && HEART && NAIL"}
+		]
+	},
+	{
+		"name": "Storigoi Graveyard (Blob Boost)",
+		"actors": [
+			{"cantHave": "RING && EYEBALL && RIB && HEART && NAIL"}
+		]
+	},
+	
+	{
+		"name": "Dabi's Path - Part 2",
+		"actors": [
+			{"cantHave": "RING && EYEBALL && RIB && HEART && NAIL"}
+		]
+	},
+	{
+		"name": "Doina - Laurels Room",
+		"actors": [
+			{"cantHave": "RING && EYEBALL && RIB && HEART && NAIL"}
+		]
+	},
+	
+	{
+		"name": "Berkeley Mansion - Part 2",
+		"actors": [
+			{"cantHave": "RING && EYEBALL && RIB && HEART && NAIL"},
+			{"cantHave": "dagger || silver knife || flame whip ||gold knife ||garlic || laurels || morning star|| thorn whip|| chain whip|| diamond|| sacred flame|| oak stake||holy water||magic cross||silk bag||white crystal|| blue crystal||red crystal||fangs"}
+		]
+	},
+	
+	{
+		"name": "Rover Mansion - Part 2",
+		"actors": [
+			{"cantHave": "RING && EYEBALL && RIB && HEART && NAIL"},
+			{"cantHave": "dagger || silver knife || flame whip ||gold knife ||garlic || laurels || morning star|| thorn whip|| chain whip|| diamond|| sacred flame|| oak stake||holy water||magic cross||silk bag||white crystal|| blue crystal||red crystal||fangs"}
+		]
+	},
+	{
+		"name": "Brahm Mansion - Part 1",
+		"actors": [
+			{"cantHave": "RING && EYEBALL && RIB && HEART && NAIL"}
+		]
+	},
+	
+	{
+		"name": "Brahm Mansion - Death Fight",
+		"actors": [
+			{"cantHave": "RING && EYEBALL && RIB && HEART && NAIL"}
+		]
+	},
+	
+	{
+		"name": "Vrad Mountain - Part 2 (Diamond Dude)",
+		"actors": [
+			{"cantHave": "RING && EYEBALL && RIB && HEART && NAIL"}
+		]
+	},
+	{
+		"name": "Bodley Mansion - Part 2",
+		"actors": [
+			{"cantHave": "RING && EYEBALL && RIB && HEART && NAIL"},
+			{"cantHave": "dagger || silver knife || flame whip ||gold knife ||garlic || laurels || morning star|| thorn whip|| chain whip|| diamond|| sacred flame|| oak stake||holy water||magic cross||silk bag||white crystal|| blue crystal||red crystal||fangs"}
+		]
+	},
+	
+	
+	{
+		"name": "Laruba Mansion - Part 2",
+		"actors": [
+			{"cantHave": "RING && EYEBALL && RIB && HEART && NAIL"},
+			{"cantHave": "RING && EYEBALL && RIB && HEART && NAIL"}
+		]
+	},
+	{ "name": "Laruba Mansion - Camilla Fight",
+		"actors": [
+			{"cantHave": "RING && EYEBALL && RIB && HEART && NAIL"}
+		]
+	},
+	
+	{ "name": "Debious Woods - Part 3",
+		"actors": [
+			{"cantHave": "RING && EYEBALL && RIB && HEART && NAIL"}
+		]
+	}
+	
+	
+]
+
+

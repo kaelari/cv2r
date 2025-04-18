@@ -2,19 +2,19 @@
 	{
 		"name": "Jova",
 		"actors": [
-			{"mustHave": "thorn whip"} 
+			{"mustHave": "white crystal"} 
 		]
 	},
 	{
 		"name": "Jova - Thorn Whip Room",
 		"actors": [
-			{"mustHave": "laurels"}
+			{"mustHave": "thorn whip"}
 		]
 	},
 	{
 		"name": "Jova - Holy Water Room",
 		"actors": [
-			{"mustHave": "oak stake"}
+			{"mustHave": "holy water"}
 		]
 	}
 	

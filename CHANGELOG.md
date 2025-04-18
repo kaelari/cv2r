@@ -1,5 +1,13 @@
 # CHANGELOG
 
+## 1.8.13
+* added yes man patch (Thanks Burb)
+* added fast lakes (Thanks Burb)
+* added bridge rando (Thanks Burb!)
+* put checks in so buying an extra whip or crystal won't crash the game. this should never be needed but just in case.
+
+
+
 ## 1.8.12
 * fixed a bug with map rando not generating properly
 * simon on warping back to jova will no longer fall a short distance.
