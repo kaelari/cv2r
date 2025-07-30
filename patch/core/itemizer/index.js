@@ -26,11 +26,20 @@ function asmFile(name) {
 
 // return an array of all actors that can hold an item
 function itemActors() {
-	return core
-		.filter(c => c.actors)
-		.map(c => c.actors.filter(a => a.holdsItem))
-		.filter(c => c.length > 0)
-		.reduce((a, c) => a.concat(c), []);
+    if (global.uc){
+        return core
+            .filter(c => c.actors)
+            .map(c => c.actors.filter(a => a.holdsItem))
+            .filter(c => c.length > 0)
+            .reduce((a, c) => a.concat(c), []);
+    }else {
+        return core
+            .filter(c => c.actors)
+            .map(c => c.actors.filter(a => (a.holdsItem && !a["7F"] )))
+            .filter(c => c.length > 0)
+            .reduce((a, c) => a.concat(c), []);
+        
+    }
 }
 
 // distribute all items in the game to actors that can hold them, based on progression logic
@@ -40,6 +49,8 @@ function randomize(rng, { logic }) {
 
 	// get all actors that can hold a game item and sort in descending order
 	const actors = itemActors();
+    
+    
 	actors.forEach((a, index) => {
 		a.index = index;
 
@@ -70,8 +81,7 @@ function randomize(rng, { logic }) {
 			itemList.push(item.name);
 		}
 	});
-
-	// attach an item randomly to an actor
+    // attach an item randomly to an actor
 	const itemKeys = ['HOLY_WATER', 'WHITE_CRYSTAL', 'BLUE_CRYSTAL', 'RED_CRYSTAL', 'OAK_STAKE', 'HEART',
 		'LAURELS', 'GARLIC', 'NAIL', 'DIAMOND', 'MAGIC_CROSS', 'RING', 'EYEBALL', 'RIB'];
 	const baseFuncs = {};
@@ -123,6 +133,7 @@ const clone = () => Object.assign({}, visited);
 			if (actor.mustHave === item){return true;}
 			return false;
 		});
+        
 		if (!choices.length){
 			// evaluate the logic of all available actors
 			choices = actors.filter(actor => {
@@ -133,16 +144,24 @@ const clone = () => Object.assign({}, visited);
                         return false;
                     }
                 }
-				if (actor.name === "merchant" && item === "clue"){return false;}
+				if (actor.name === "merchant" && item === "clue"){ return false;}
 				if (!isDep) { return true; }
 				if (actor.requirements[logic] === '') { return true; }
 				const script = new vm.Script(funcCode + evalLogic(actor.requirements[logic]));
 				return script.runInNewContext();
 			});
+            const merchants = choices.filter(actor => actor.name === 'merchant');
+
+            if (merchants.length > 0 && !isDep) {
+                choices = merchants;
+            }
 		}
+		
 		// bail if we can't find an available actor
 		if (!choices.length) {
-			
+            
+            
+			console.log(`cannot find free actor for ${item}`);
 			throw new Error(`cannot find free actor for ${item}`);
 		}
         
@@ -155,7 +174,7 @@ const clone = () => Object.assign({}, visited);
 		// remove chosen actor from list after processing
 		const aIndex = actors.findIndex(a => a.index === choice.index);
 		actors.splice(aIndex, 1);
-
+        
 		// Dyanmically create a logic function for the current item to be
 		// used in logic evaluation for all following items.
 		const key = itemToKey(item);
@@ -165,9 +184,16 @@ const clone = () => Object.assign({}, visited);
 	}
 
 	// Add items to actors based on dependencies, starting with progression items
-	itemDeps.forEach(i => processItem(i, true));
+	itemDeps.forEach(i => {
+        
+        processItem(i, true);
+        
+        
+    });
 	const listCopy = itemList.slice(0);
-	listCopy.forEach(i => processItem(i));
+	listCopy.forEach(i => {processItem(i);
+        
+    });
 }
 
 // Write and re-route data that determines the sales icon and prices for all merchants
@@ -247,7 +273,7 @@ module.exports = {
 		const deathValues = {};
 		const camillaValues = {};
 		const textValues = {};
-
+        const bookValues = {};
 		// initialize items
 		opts.hasFangs = opts.patch && /(^|,)fangs($|,)/.test(opts.patch);
 		items.initItems(pm, rng, opts);
@@ -256,10 +282,11 @@ module.exports = {
 				
 				const actors =    core
 		.filter(c => c.actors)
-		.map(c => c.actors.filter(a => a.holdsItem))
+		.map(c => c.actors.filter(a => (a.holdsItem || a["7F"]) ))
 		.filter(c => c.length > 0)
 		.reduce((a, c) => a.concat(c), []);
 				actors.forEach((a, index) => {
+                    
 					if (actor.name === a.name && actor.locationName===a.locationName) {
 						a.itemName = actor.itemName;
 						const arr = a.itemName.match(/[0-9]+$/)[0];
@@ -287,8 +314,8 @@ module.exports = {
 					if (err.message.includes('cannot find free actor')) {
                         errors += 1;
                         
-                        if (errors >= 100){
-                            throw new Error("couldn't place items after 100 attempts");
+                        if (errors >= 20){
+                            throw new Error("couldn't place items after 20 attempts");
                         }
 						wrapper();
 					} else {
@@ -353,19 +380,35 @@ module.exports = {
 		pm.add([0x90, 0x3C], 0x1EDB4);
 
 		// process all actors with an item
-		const itemActors = core
+        var itemActors;
+        if (global.uc){
+		
+            itemActors = core
 			.filter(c => c.actors)
 			.map(c => c.actors.filter(a => a.holdsItem))
 			.filter(c => c.length > 0)
 			.reduce((a, c) => a.concat(c), [])
-			.filter(a => a.itemName);
-
+			.filter(a => a.itemName );
+        }else {
+        itemActors = core
+			.filter(c => c.actors)
+			.map(c => c.actors.filter(a => a.holdsItem && !a["7F"]))
+			.filter(c => c.length > 0)
+			.reduce((a, c) => a.concat(c), [])
+			.filter(a => a.itemName );
+        
+            
+        }
 		let spoiler = [['item', 'actor', 'location', 'entry room']];
 		log('', true);
 		
 		itemActors.forEach(actor => {
 			let jsrBuf;
 			let item = items.find(i => i.name === actor.itemName);
+            if (!item) {
+                console.error(`Item not found for actor: ${JSON.stringify(actor, null, 2)}`);
+                throw new Error(`No item with name '${actor.itemName}' found in items list`);
+            }
 			if (opts.world){
 				item = items.find(i => i.name === actor.itemName && i.destworld == actor.destworld);
 			}
@@ -378,6 +421,7 @@ module.exports = {
 				}else {
 					
 					item.code = item.bankCode[actor.bank];
+                    
 					item.codeBytes = assemble(item.code);
 					
 				}
@@ -410,9 +454,13 @@ STA *$01
 
 			// Death code
 			if (actor.name === 'Death') {
-				deathValues.itemCode = item.code;
+                deathValues.itemCode = item.code;
 			}
-
+            if (actor["7F"]) {
+                
+                bookValues["value_"+actor["7F"]] = item.code;
+                
+            }
 			// Death code
 			else if (actor.name === 'Camilla') {
 				camillaValues.itemCode = item.code;
@@ -571,5 +619,14 @@ STA *$01
 				padding: 4
 			}
 		});
+        if (global.uc){
+        modSubroutine(pm.name, asmFile('book.asm'), bank[1], {
+            values: bookValues,
+            invoke: {
+                romLoc: 0x47EB,
+                jump: 1
+            }
+        });
+        }
 	}
 };

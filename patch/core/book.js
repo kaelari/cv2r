@@ -123,6 +123,8 @@ module.exports = {
 				} else {
 					clues.push(`garlic needed to get ${preWrap(item)}`);
 				}
+			} else if (actor === 'book') {
+				clues.push(`${fullWrap(item)} in a book in ${location}`);
 			} else {
 				// we didn't match any actor?! what's going on here
 				return;
@@ -143,7 +145,7 @@ module.exports = {
 		core.forEach(loc => {
 			if (!loc.actors) { return; }
 			
-			loc.actors.filter(a => (a.fixture && a.name === 'book') || (a.itemName == "clue")).forEach(a => {
+			loc.actors.filter(a => (a.itemName == "clue")).forEach(a => {
 				
 				let index = 0;
 				let maxlength = a.text.length;

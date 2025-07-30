@@ -88,7 +88,7 @@ function getCarry(hasFangs= false, opts) {
 		{ name: 'magic cross', type: 'carry', value: 0x02, icon: 0x5A, price: 100 },
 		{ name: 'garlic', type: 'carry', value: 0x08, icon: 0x6D, price: 50, count: 2, bankCode: [], freeBankCode: [] }
 	];
-	if (hasFangs) {
+	if (hasFangs && !global.uc) {
 		carryItems.push(
 			{ name: 'laurels', type: 'carry', value: 0x04, icon: 0x58, price: 50, count: 4, bankCode: [], freeBankCode: [] },
 			{ name: 'fangs', type: 'carry', value: 0x10, icon: 0x4D, price: 100 }
@@ -97,15 +97,27 @@ function getCarry(hasFangs= false, opts) {
 		carryItems.push(
 			{ name: 'laurels', type: 'carry', value: 0x04, icon: 0x58, price: 50, count: 5, bankCode: [], freeBankCode: [] }
 		);
-// 		carryItems.push(
-// 			{ name: 'clue', type: 'carry', value: 0x00, icon: 0x4D, price: 0, count: 0, bankCode: [] }
-// 		);
+ 		
 	}
+	if (global.uc){
+        if (hasFangs) {
+           carryItems.push( { name: 'fangs', type: 'carry', value: 0x10, icon: 0x4D, price: 100 });
+           carryItems.push(
+  			{ name: 'clue', type: 'carry', value: 0x00, icon: 0x4D, price: 0, count: 12, bankCode: [] }
+            );
+        }else {
+            carryItems.push(
+                { name: 'clue', type: 'carry', value: 0x00, icon: 0x4D, price: 0, count: 13, bankCode: [] }
+            );
+        }
+    }
 	return carryItems;
 }
 
 items.allItems = function () {
-	return [...getWhips(), ...getWeapons(), ...getInventory(), ...getCarry()];
+    const foo = [...getWhips(), ...getWeapons(), ...getInventory(), ...getCarry()];
+    
+	return foo;
 };
 
 items.initItems = function initItems(pm, rng, opts) {
@@ -132,9 +144,7 @@ JSR $${loc.ram.toString(16)}
             
 			const file = path.join(__dirname, 'asm', 'whip.asm');
             var levelup="";
-            
-            
-                if (global.pacifist === 1) {
+            if (global.pacifist === 1) {
                     
                     levelup = `INC $8B
 LDA $8b

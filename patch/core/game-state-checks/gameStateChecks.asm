@@ -15,8 +15,14 @@ LDA *$F1
 CMP #$40
 BNE DONE
 ; deselect quest item
+LDA *$33
+CMP #$01
+BEQ weapondeselect
 LDA #$00
 STA *$4F
+BEQ DONE
+weapondeselect
+LDA #$00
 STA *$90
 BEQ DONE
 

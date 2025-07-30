@@ -3,7 +3,7 @@
 
 ; LDA #$03
 ; JSR $C183
-LDA #$70
+LDA #$7d
 ;ADC $324
 STA $324
 LDA #$00

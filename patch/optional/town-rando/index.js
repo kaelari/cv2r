@@ -103,18 +103,17 @@ const towns = {
 		rightvalue: [0xFC, 0x02, 0x03],
 		fromleftoffset: 0xA1B5,
 		fromrightoffset: 0xA6E3,
-		fromleftvalue: [0xFF,0x00,0x01],
-		fromrightvalue: [0xFF,0x00,0x01], 
+		fromleftvalue: [0xFf,0x00,0x01],
+		fromrightvalue: [0xFf,0x00,0x01], 
 		torightheightchange: 0x1FB34,
 		
 		mapoffset: 0x8710,
 		mapvalue: 0x7f83,
 		towntype: "B",
-		
-		
+
 		leftheight: 2,
 		isveros: true,
-		onlyheight1: true,
+		//onlyheight1: true,
 		town: true,
 	},
 	Doina: {
@@ -153,9 +152,9 @@ const towns = {
 		mapvalue: 0x7f83,
 		towntype: "B",
 		
-		
+		isyomi: true,
 		leftheight: 2,
-		onlyheight1: true,
+		//onlyheight1: true,
 		nojova: true,
 		town: true,
 	},
@@ -245,7 +244,7 @@ const towns = {
 		fromleftvalue: [0xFF,0x01,0x02],
 		fromrightvalue: [0xFF,0x01,0x02],  
 		//leftheightoffset: 0xA6F8,
-		onlyheight1: false,
+		//onlyheight1: false,
 		nojova: true,
 		rightsidewall: true,  
 		beroveroffset: 0x9267,
@@ -305,8 +304,19 @@ function copytown (town1, town2, pm, logic){
 		
 		pm.add(leftvalue, towns[town2].leftoffset);
 		pm.add(rightvalue, towns[town2].rightoffset);
+        if (towns[town1].isyomi){
+            fromleftvalue[0]=0xf6;
+            yomiheight = towns[town2].height;
+        }
+        if (towns[town1].isveros){
+            fromleftvalue[0]=0xf5;
+            fromrightvalue[0]=0xf5;
+            log(fromrightvalue);
+            verosheight = towns[town2].height;
+        }
 		pm.add(fromleftvalue, towns[town1].fromleftoffset);
 		if (towns[town1].fromrightoffset > 0) {
+            
 			pm.add(fromrightvalue, towns[town1].fromrightoffset);	
 		}
 		
@@ -318,7 +328,7 @@ function copytown (town1, town2, pm, logic){
 		}else {
 			towns[town2].cantornado = 0;
 		}
-		log(town2+" new town reqs:" +towns[town2].reqs);
+		
 		
 		
 }
@@ -337,6 +347,8 @@ module.exports = {
         var spoiler = [];
 		const { logic, rng } = opts;
 		var attempts = 0;
+        verosheight = 0;
+        yomiheight = 0;
 		while (1){
 			const townnames = ["Jova",'Rover Mansion - Door',"Yomi","Veros", "Doina", 'Brahm Mansion - Door', 'Laruba Mansion - Door',"Berkeley Mansion - Door", "Alba", "Ondol", "Aljiba", 'Bodley Mansion - Door'];
 			const townnames2 =  ["Jova", "Alba", "Ondol", "Aljiba", "Doina", 'Brahm Mansion - Door', "Yomi", "Veros", "Berkeley Mansion - Door", 'Laruba Mansion - Door','Bodley Mansion - Door','Rover Mansion - Door'];
@@ -399,10 +411,54 @@ module.exports = {
 				pm.add(townamap, 0x882f);
 			}
 		}
-			
-
-		
-		
+		const transition = modSubroutine(pm.name, path.join(__dirname, 'transition.asm'), bank[2], {
+                invoke: {
+                    romLoc: 0x01D0CE,
+                    padding:1,
+                    jump: true
+                    } ,
+                values: {
+                    verosheight: verosheight,
+                    yomiheight: yomiheight,
+                
+                    
+                }
+                    
+                } );	
+        const transition2 = modSubroutine(pm.name, path.join(__dirname, 'transition2.asm'), bank[2], {
+            invoke: {
+                    romLoc: 0x01D201,
+                    padding:1,
+                    jump: true
+                    } ,
+                values: {
+                    verosheight: verosheight,
+                    yomiheight: yomiheight,
+                }
+                    
+                } );	
+		/*modSubroutine(pm.name, path.join(__dirname, 'bank-switch.asm'), bank[7], {
+                invoke: {
+                    romLoc: 0x01D201,
+                    padding:1,
+                    jump: true
+                    } ,
+                values:{ 
+                    dest:transition2.ram.toString(16) 
+                }
+        });
+        
+        modSubroutine(pm.name, path.join(__dirname, 'bank-switch.asm'), bank[7], {
+                invoke: {
+                    romLoc: 0x01D0CE,
+                    padding:1,
+                    jump: true
+                    } ,
+                values:{ 
+                    dest:transition.ram.toString(16) 
+                }
+        });
+        */
 		for (let town in towns){
 			
 			let townReqs = towns[town].reqs;
@@ -456,7 +512,7 @@ module.exports = {
 				}
 				actor.requirements[logic] = newReqs;
 				if (newReqs){
-					log(door.name + " "+ actor.name + "now logic: " +newReqs);
+					//log(door.name + " "+ actor.name + "now logic: " +newReqs);
 				}
 			});
 				

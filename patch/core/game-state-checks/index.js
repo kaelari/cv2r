@@ -20,7 +20,7 @@ RTS
 			`;
 			
 		}
-		memory.gameStateChecks = modSubroutine(pm.name, path.join(__dirname, 'gameStateChecks.asm'), bank[2], {
+		memory.gameStateChecks = modSubroutine(pm.name, path.join(__dirname, 'gameStateChecks.asm'), bank[3], {
 			values: {
 					downab: down
 			}

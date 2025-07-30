@@ -942,6 +942,10 @@ module.exports = {
 			//console.log(branch.join("->"));
 			signs(branch, pm)
 		});
+        //blob breaks with the code below but only blob. so we fix it
+        const blobvalue= [0xFF, 0x03,0x00];
+		const bloboffset = 0xB392;
+        
 		const exit = modSubroutine(pm.name, path.join(__dirname, 'transition.asm'), bank[7]);
 		const code = `JMP $${exit.ram.toString(16)}`;
 		var bytes = assemble(code);

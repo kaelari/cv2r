@@ -8,7 +8,7 @@ LDA *$1C
 STA $600D
 
 ; bank swap
-LDA #02
+LDA #$03
 JSR $C183
 
 ; game state checks

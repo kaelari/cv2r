@@ -55,13 +55,13 @@ module.exports = {
                     value = 0;
                     if (loc.death) {
                         value = 0x9;
-                        log ("death sprites");
+                        
                     }else if (loc.camilla){
                         value = 0xA;
-                        log("camilla sprites");
+                        
                     }else if (loc.drac){
                         value =  0x0c; // no clue if this is right
-                        log("drac sprites");
+                        
                     }
                 loc.pattern = {
                    
