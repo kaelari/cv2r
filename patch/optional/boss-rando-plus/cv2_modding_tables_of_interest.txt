@@ -1,0 +1,203 @@
+Notes.
+map ptr 2b
+enemy record 4b
+enemylist FF terminator 1b
+
+berk
+orb room is always real. no hidden exit.
+if boss, then downstairs wall is passable
+needs 1 extra map ptr
+needs 2 extra actors (orbroom block, downstairs wallblock|boss)
+needs 1 extra actorlist FF
+
+rover
+move lower hintbook to rover1, accessible climbing only one level
+put 2nd orb room upstairs. is fake unless there's a boss here.
+then, old orb room becomes fake, and leads to boss
+NOTE this only works if there is a full-metatile passable wall for upstairs rover1.
+needs 0 extra map ptrs (already has wrongwarp)
+needs 3 extra actors (orbroom block, upstairs rover1 block|fake orb, boss)
+needs 1 extra actorlist (there is already wrongwarp map, but it has no actorlist)
+
+brahm
+replace brahm2 corridor with orbroom. always real.
+if boss, then rear exit. BLOCK EAST EXIT OF BOSSROOM.
+needs 2 extra actors (orbroom block, boss exit blocker) (easy, we are eliminating 3 bats)
+NOTE we are removing one map ptr, an actor list for old orbroom, and one actor.
+     can we repurpose this space for another mansion's boss room's actorlist?
+
+bod
+replace se 2 rooms (including blank) to extend to map edge.
+(would be nice to populate these 2 rooms, but already short on actors)
+bod3 is either orbroom or boss. bod4 is bossroom.
+needs 2 extra map ptrs
+needs 2 extra actors (orbroom block, boss) (need to repurpose some rocks)
+needs 1 extra actorlist FF
+
+laruba
+create hole in wall laruba2 east to upper interior void.
+replace room below with orbroom.
+create hole in floor to escape void.
+fill exit to bossroom with false wall.
+invisible block entity in that gap if no boss, else block boss east exit.
+needs 1 extra actor (wall blocker to boss entrance or exit) (easy, eliminating skelly)
+(removing one map ptr and an [now empty] actor list for old orbroom)
+
+////////////////////
+metatiles:
+LevelData_MetaTiles_1_Mansions
+1b count (plus one. -1 for actual count)
+<count>b palette for each metatile?
+$10b indexes into background tilemap. 4x4, rows first
+
+collision info is apparently hardcoded(?) for each tile.
+
+so we can repurpose metatile $0D (unused signpost), palette already correct.
+tile bytes are file position 0x109B4
+use vals (nonsolid blocks):
+D9 DB D9 DB
+DA DC DA DC
+D9 DB D9 DB
+DA DC DA DC
+
+////////////////////
+ObjectCurrentActionType
+HPcostByMonsterHit
+ObjectScreenXCoord
+LevelData_Actors_1_Mansions_012345
+ x y type hp
+LevelData_ScreenNumbers_1_Mansions_9brahm_2
+0 LevelData_Screens_1_Mansions_0larubaEntrance_A - laruba 1
+1 LevelData_Screens_1_Mansions_1berkeleyEntrance_A - laruba 2
+
+2 LevelData_Screens_1_Mansions_2roverEntrance_A - actually NON rover entrance (no wall)
+3 LevelData_Screens_1_Mansions_3brahmEntrance_A - actually rover entrance (wall)
+	
+4 LevelData_Screens_1_Mansions_4bodleyEntrance_A - berk 1
+5 LevelData_Screens_1_Mansions_5_A - berk 2
+
+6 LevelData_Screens_1_Mansions_6laruba_A - rover 1
+7 LevelData_Screens_1_Mansions_7berkeley_A - rover 2
+
+8 LevelData_Screens_1_Mansions_8rover_A - brahm 1
+9 LevelData_Screens_1_Mansions_9_10_A - brahm 2  (2 entries?)
+
+A (repeat brahm 2)
+
+B LevelData_Screens_1_Mansions_11_A - boss room
+C LevelData_Screens_1_Mansions_12_A - orb room
+
+D LevelData_Screens_1_Mansions_13_A - bodley 1
+E LevelData_Screens_1_Mansions_14_A - bodley 2
+
+LevelData_Screens_5_Ruins_0_A - drac 1
+LevelData_Screens_5_Ruins_1_A - drac 2 boss
+
+LevelData_Screen_Map1_2 - brahm??? entrance? (no wall)
+LevelData_Screen_Map1_3 - rover entrance (wall)
+LevelData_Screen_Map1_5_and_1_7_and_1_12_and_1_14 - orb room
+LevelData_Screen_Map1_11 - boss room
+LevelData_Screens_4_Wastelands_7_A - inside debora cliff?
+LevelData_Screen_Map2_16_17_and_2_18_and_3_10_and_4_5_6 - river banks?
+
+
+church face? LevelData_Screen_Map0_0_and_0_1_and_0_3_and_0_4
+
+0 doina LevelData_Screens_0_Towns_0aldra_A
+1 veros
+2 aljiba
+3 jova
+4 alba LevelData_Screens_0_Towns_4ondol_A
+5 ondol LevelData_Screens_0_Towns_5doina_A
+6 yomi
+
+
+f:
+Object_ComparePositionToSimonPosition
+AnyBankPlayTracks
+SimonDamageKnockBack
+----------------------------
+leveldata palette stuff:
+xx xx (bgpal, spritepal)
+can extend by repurposing "night" front gate palette since there are no enemies.
+point all "night" front gates at the same palette.
+
+leveldata actors:
+may need to remove one actor from mansion zone 1 to make room for extra room indexes.
+may need to remove one actor from mansion zone 2 to make room for new boss.
+(maybe 2 actors each, since we need FF terminator??
+
+
+x y type HP
+$05,$28,$22,$A4 berk invisible floating block, moves vert
+1010 0100
+
+$24,$25,$21,$85 rover sideways block, moves horiz
+1000 0101
+
+$09,$36,$22,$65 laruba floating blocks, moves horiz
+$15,$36,$22,$66
+0110 0101
+0110 0110
+
+within-room coords of orb (measured in 16x16px blocks):
+$0D,$07
+(rover's orb $3D,$15)
+
+
+LevelData_ScreenNumbers_1_Mansions_0larubaEntrance
+	$88C7  F2 88:       .word (LevelData_ScreenNumbers_1_Mansions_0larubaEntrance_88F2) ;88F2 (88F2) ()
+	$88C9               .byte $00,$FF,$03,$00,$FF,$03,$03
+LevelData_ScreenNumbers_1_Mansions_0larubaEntrance_88F2
+	$88F2               .byte $00
+
+LevelData_ScreenNumbers_1_Mansions_6laruba
+	$88D2  F3 88:       .word (LevelData_ScreenNumbers_1_Mansions_6laruba_88F3) ;88F3 (88F3) ()
+	$88D4               .byte $03,$FB,$00,$00,$FB,$00,$00
+LevelData_ScreenNumbers_1_Mansions_6laruba_88F3
+	$88F3               .byte $01,$FD,$00
+
+LevelData_ScreenNumbers_1_Mansions_1_12_13_14_15_16_17
+	$8D3A  62 8D:       .word (LevelData_ScreenNumbers_1_Mansions_1_12_13_14_15_16_17_8D62) ;8D62 (8D62) ()
+	$8D3C               .byte $00,$FF,$02,$01,$FF,$02,$04
+LevelData_ScreenNumbers_1_Mansions_1_12_13_14_15_16_17_8D62
+	$8D62               .byte $00
+
+LevelData_ScreenNumbers_1_Mansions_7berkeley
+	$8D45  63 8D:       .word (LevelData_ScreenNumbers_1_Mansions_7berkeley_8D63) ;8D63 (8D63) ()
+	$8D47               .byte $01,$FB,$01,$00,$FB,$01,$00
+LevelData_ScreenNumbers_1_Mansions_7berkeley_8D63
+	$8D63               .byte $00,$00
+ (LevelData_ScreenNumbers_1_Mansions_18 is a perfect copy of this struct. redundant AND CONTIGUOUS!
+  I can extend berkeley's screens in-place!)
+
+LevelData_ScreenNumbers_1_Mansions_8rover
+	$923D  60 92:       .word (LevelData_ScreenNumbers_1_Mansions_2roverEntrance_9260) ;9260 (9260) ()
+	$923F               .byte $02,$FB,$02,$00,$FB,$02,$00
+LevelData_ScreenNumbers_1_Mansions_2roverEntrance_9260
+	$9260               .byte $00
+
+LevelData_ScreenNumbers_1_Mansions_2roverEntrance
+	$924A  60 92:       .word (LevelData_ScreenNumbers_1_Mansions_2roverEntrance_9260) ;9260 (9260) ()
+	$924C               .byte $00,$FC,$02,$05,$FF,$00,$01
+
+LevelData_ScreenNumbers_1_Mansions_3brahmEntrance
+	$967B  9C 96:       .word (LevelData_ScreenNumbers_1_Mansions_3brahmEntrance_969C) ;969C (969C) ()
+	$967D               .byte $00,$FF,$04,$00,$FF,$02,$06
+LevelData_ScreenNumbers_1_Mansions_3brahmEntrance_969C
+	$969C               .byte $00,$FD,$00
+
+LevelData_ScreenNumbers_1_Mansions_9brahm
+	$9686  9C 96:       .word (LevelData_ScreenNumbers_1_Mansions_3brahmEntrance_969C) ;969C (969C) ()
+	$9688               .byte $03,$FB,$03,$00,$FB,$03,$00
+
+LevelData_ScreenNumbers_1_Mansions_4bodleyEntrance
+	$9A51  6C 9A:       .word (LevelData_ScreenNumbers_1_Mansions_4bodleyEntrance_9A6C) ;9A6C (9A6C) ()
+	$9A53               .byte $00,$FF,$03,$03,$FF,$04,$02
+LevelData_ScreenNumbers_1_Mansions_4bodleyEntrance_9A6C
+	$9A6C               .byte $00
+
+LevelData_ScreenNumbers_1_Mansions_Abodley
+	$9A5C  6C 9A:       .word (LevelData_ScreenNumbers_1_Mansions_4bodleyEntrance_9A6C) ;9A6C (9A6C) ()
+	$9A5E               .byte $01,$FB,$04,$00,$FB,$04,$00
+

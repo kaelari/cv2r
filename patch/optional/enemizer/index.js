@@ -212,6 +212,11 @@ module.exports = {
 				}
 
 				// write all the enemy position changes to patch
+				
+                if (a.data == 0){
+                    //if something has 0 hp give it 1. this only affects the "rocks" on bodley
+                    a.data= 1;
+                }
 				pm.add([ a.x, a.y, a.id, a.data ], a.pointer);
 			});
 

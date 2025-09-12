@@ -34,50 +34,215 @@ module.exports = {
 		} = require('../../../lib');
 		const { rng } = opts;
 
-		// convert text string to bytes and add the patch
-		const titlePrint = (text, rom) => patchGroup.add(textToBytes(text, TEXT_MAP_TITLE), rom);
+		/*
+			1b strlen:  high bit on = nonrepeating, off = repeating
+			Nb string:  1b if repeating, Nb if nonrepeating
+			(repeat)
+		*/
+		const buildTitleBytes = () => {
+			const bytelimit = 0x56;  // the exact number of bytes we are replacing!
+			let output = [];
+			let col = 0x1C; // column. start after logo, screen width is 0x20
+			let runlen;
+			let v = version;
+			let lines = [
+				"randomizer",
+				null,  // fill with excess spaces to eat bytes.
+				v,
+				"",  // future use?
+				"kaelari",
+				"bloodsweatandcode"
+			];
+			let neededlen = lines.join("").length + 6 + 14;
+			let excesslen = bytelimit - neededlen;
 
-		// attempt to provide equal left/right padding on a title string
-		const titlePad = (text, size) => {
-			let padFront = text.length % 2;
-			while (text.length < size) {
-				text = `${padFront ? ' ' : ''}${text}${padFront ? '' : ' '}`;
-				padFront = !padFront;
+			if (excesslen < 0){
+				lines = [
+					"error",
+					"",
+					"",
+					"how much text",
+					"can you cram",
+					"on this screen?"
+				];
+				neededlen = lines.join("").length + 6 + 14;
+				excesslen = bytelimit - neededlen;
 			}
-			return text;
-		};
 
-		// It's important that the exact number of characters in the following strings are used.
-		titlePrint('  randomizer  ', 0x01041E);
-		titlePrint(titlePad(`v${version}`, 13), 0x010169);
-        if (patchGroup.string.length) {
-            var string = patchGroup.string;
-            let sortString = (stringg) => {
-                    return stringg.split("").sort().join("");
-                };
-            string = sortString(string.toLowerCase());
-            if (string === sortString("1eghopt".toLowerCase() ) ){
-                string = "Tournament";
+			lines.forEach( (l) => {
+				let b;
+				if (!l) {
+					let p = Math.min(excesslen, 0x20);
+					if (!p){
+						// zero excesslen, but we can't use emptystring.
+						// so we remove this string and add a space to the next.
+						b = "";
+						excesslen = 1;
+					}else{
+						excesslen = excesslen - p;
+						b = "".padStart(p);
+					}
+				}else{
+					b = l;
+				}
+
+				let spac = (0x20 - col) + (0x10 - Math.floor(b.length / 2));
+				col = col + spac + b.length;
+				if (!b){
+					b = [];
+				}else{
+					if (excesslen == 1){
+						b += " ";
+						col += 1;
+						excesslen = 0;
+					}
+					b = textToBytes(b, TEXT_MAP_TITLE);
+					b.unshift(b.length | 0x80);  // high bit = nonrepeating
+				}
+				col = col % 0x20;
+				b = [spac, 0xc1].concat(b);
+
+				output = output.concat(b);
+			});
+
+			output = output.concat([0x21 - col, 0xc1]);
+			if (output.length != bytelimit) {
+				console.log("ERROR in buildTitleBytes: byte length does not match!");
+				console.log(output.length.toString(16));
+				return null;
+			}
+			return output;
+		}
+		patchGroup.add(buildTitleBytes(), 0x10166);
+
+		//////////////
+		// replace "prologue" screen contents with tabulated 2-letter flaglist.
+		// TOTAL BYTES AVAILABLE = 199
+
+		let sortString = (stringg) => {
+				return stringg.split("").sort().join("");
+			};
+		if (patchGroup.string.length) {
+			var legacypatchstring = sortString(patchGroup.string.toLowerCase());
+		}
+		// y = screen row (0-27), x = screen col (0-31)
+		const prologueCoordToBytes = (y, x) => {
+			let val = 0x2420 + (y * 0x20) + x;
+			return [ (val & 0xff00) / 0x100, val & 0xff ];
+		};
+		// build and format a table of 2-character flags, return bytes
+		let hiddenflags = opts.patch.split(',').includes('hide-flags');
+		let halfway;
+		/*
+			(struct indexed from ptr table)
+			2b encoded coords (in 8x8 tiles)
+			Nb string
+			1b $FE terminate string
+		*/
+		const getFlagListLines = (flaglist) => {
+			let sidepad, betweenpad, perline;
+			let output = [];
+			// max flaglabel length of 3. 1-length labels are legacy only.
+			flaglist = flaglist.filter( e => e && e.length < 4 ).sort();
+			// rows (0indexed) are 12, 14, 16, 18, 20, 22
+			// cols (0indexed) restricted to 1 < c < 30 (leave at least 2 sidepad LR)
+			// max bytes per row = (3*7) + 6 + 3 = 30
+			// bytes for 6 rows (not counting label) = 30 * 6 = 180
+			// TOTAL BYTES AVAILABLE = 199
+			flaglist = flaglist.slice(0, 6 * 7);  // truncate huge flag list.
+			let logic = opts.logic;
+            let customjson = opts.customjson;
+			let listlabel;
+
+			if (flaglist.length > 41){
+				listlabel = null;
+			}
+			else if(hiddenflags){
+				listlabel = "hidden flags";
+			}
+            else if (logic === "standard" && customjson == null && patchGroup.string.length == patchGroup.flaglabels.length && legacypatchstring === sortString("1eghopt".toLowerCase() ) ){
+                listlabel = "Tournament";
             }
-            if (string === sortString("1OPQegh".toLowerCase() )){
-                string = "Standard";
+            else if (logic === "standard" && customjson == null && patchGroup.string.length == patchGroup.flaglabels.length && legacypatchstring === sortString("1OPQegh".toLowerCase() )){
+                listlabel = "Standard";
             }
-            
-            if (string.length> 24){
-                
-                string = string.slice(0, 24);
-            }
-            titlePrint(titlePad(string, 24), 0x010179);
-            
-        }else {
-            titlePrint('                        ', 0x010179);
-        }
-		
-		titlePrint('  Kaelari  ', 0x010194);
-		titlePrint('    bloodsweatandcode   ', 0x0101A2);
+			else {
+                if (customjson == null){
+                    listlabel = logic + " logic";
+                }else{
+                    listlabel = "modified "+ logic + " logic";
+                }
+			}
+			if (listlabel){
+				output = output
+					.concat( prologueCoordToBytes(0xa, 0x10 - Math.floor(listlabel.length / 2)) )
+					.concat( textToBytes(listlabel, TEXT_MAP_TITLE) )
+					.concat( 0xFD );
+			}
+			if (flaglist.length <= 6 * 4){
+				perline = 4;
+			}else{
+				perline = Math.ceil(flaglist.length / 6);
+			}
+			switch(perline){
+				case 7:
+					sidepad = 2;
+					betweenpad = 1;
+					break;
+				case 6:
+					sidepad = 2;
+					betweenpad = 2;
+					break;
+				case 5:
+					sidepad = 4;
+					betweenpad = 2;
+					break;
+				default:
+					sidepad = 4;
+					betweenpad = 4;
+					break;
+			}
+
+			let r = 0;
+			for(f of flaglist){
+				if (hiddenflags) break;   // meh, lazy.
+				if (r > 5) break;  // should be impossible.
+				if (r == 3){ // split prologue2 at "halfway" point, mark ptr.
+					halfway = output.length;
+					output[output.length - 1] = 0xFE;
+				}
+				let slc = flaglist.slice( (r * perline), ((r + 1) * perline) );
+				//console.log(slc);
+				let line = slc.map( a => a.padStart(3) ).join("".padStart(betweenpad));
+				output = output.concat(prologueCoordToBytes(12 + (r*2), sidepad))
+					.concat(textToBytes(line, TEXT_MAP_TITLE))
+					.concat(0xFD);
+				++r;
+				if ( r * perline >= flaglist.length ) break;
+			}
+			//console.log("output.length is "+output.length.toString(10));
+			if (output.length > 199){
+				// should never happen.
+				output = output.slice(0, 199);
+			}
+			output[output.length - 1] = 0xFE;  // 0xFE terminate text.
+			return output;
+		};
+		if (patchGroup.flaglabels && patchGroup.flaglabels.length){
+			patchGroup.add(getFlagListLines(patchGroup.flaglabels), 0x10366);
+		}
+		if (halfway){
+			halfway = 0x8356 + halfway;
+			patchGroup.add([ (halfway & 0xff), ((halfway & 0xff00) / 0x100)], 0x1C951);  // point prologue2 to halfway mark
+		}
+		else {
+			patchGroup.add([0x1A, 0x84], 0x1C951);  //  "remove" prologue2
+		}
+		// "remove" 'press start key', to repurpose bytes
+		patchGroup.add([0x1a, 0x84], 0x1C8a5);
 
 		// prevent selecting "password"
-		titlePrint('        ', 0x13A2D);
+		patchGroup.add(textToBytes('        ', TEXT_MAP_TITLE), 0x13A2D)
 		patchGroup.add([ 0xA9, 0x00 ], 0x1C39B);
 
 		// update game start cursor

@@ -74,7 +74,7 @@ module.exports = {
 				if (!actor.textPointer) { return; }
 				
 				
-				if (actor.dontChange){ console.log("RETURNING");return; }
+				if (actor.dontChange){ return; }
 				const textKey = actorMap[actor.name];
 				if (!textKey) { return; }
 				const index = randomInt(rng, 0, newText[textKey].length - 1);

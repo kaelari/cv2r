@@ -266,6 +266,8 @@ function modSaleData(pm) {
 module.exports = {
 	items,
 	patch: async function (pm, opts) {
+        const isBossRando = !!global.bossRando;
+
 		const { rng } = opts;
 		const orbValues = {};
 		const whipMerchantValues = {};
@@ -531,7 +533,11 @@ STA *$01
 
 				// handle price and sales icon
 				// first byte is the icon, next 2 are the price (0x01 0x72 == 172)
-				actor.sale = [item.icon, Math.floor(item.price / 100), parseInt(item.price % 100)];
+				actor.sale = [
+    item.icon,
+    toBCD(Math.floor(item.price / 100)), // hundreds digit
+    toBCD(item.price % 100)              // last two digits
+];
 				if (!actor.salePointer) {
 					throw new Error(`merchant has no sale pointer\n${JSON.stringify(actor, null, 2)}`);
 				}
@@ -547,7 +553,16 @@ STA *$01
 			const entryRoom = core.find(loc => loc.name === actor.locationName).entryRoom || '';
 
 			log(`${pad(item.name+actor.destworld, 15)} | ${pad(actor.name + (actor.name === 'merchant' ? ' (' + item.price + ')' : ''), 15)} | ${actor.locationName}`, true);
-			spoiler.push([item.name, actor.name, actor.locationName, entryRoom]);
+            let aname = actor.name
+            if (isBossRando){
+                if (actor.name == "Death"){
+                    aname = "Brahm boss";
+                }
+                if (actor.name == "Camilla"){
+                    aname = "Laruba boss";
+                }
+            }
+			spoiler.push([item.name, aname, actor.locationName, entryRoom]);
 		}  );
 
 		// TODO: resolve this laziness
@@ -629,4 +644,10 @@ STA *$01
         });
         }
 	}
+	
 };
+function toBCD(value) {
+    const tens = Math.floor(value / 10);
+    const ones = value % 10;
+    return (tens << 4) | ones;
+}

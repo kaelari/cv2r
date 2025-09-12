@@ -267,11 +267,17 @@ function copytown (town1, town2, pm, logic){
 			
 		}
 		
-		var leftvalue =towns[town1].leftvalue;
+		/*var leftvalue =towns[town1].leftvalue;
 		var rightvalue =towns[town1].rightvalue;
 		var fromrightvalue = towns[town2].fromrightvalue;
 		var fromleftvalue = towns[town2].fromleftvalue;
-		if (towns[town1].leftheightoffset > 0) {
+		*/
+        var leftvalue = [...towns[town1].leftvalue];
+        var rightvalue = [...towns[town1].rightvalue];
+        var fromrightvalue = [...towns[town2].fromrightvalue];
+        var fromleftvalue = [...towns[town2].fromleftvalue];
+
+        if (towns[town1].leftheightoffset > 0) {
 			
 			var value=towns[town2].height-towns[town1].leftheight;
 			pm.add([value] , towns[town1].leftheightoffset);
@@ -350,30 +356,26 @@ module.exports = {
         verosheight = 0;
         yomiheight = 0;
 		while (1){
-			const townnames = ["Jova",'Rover Mansion - Door',"Yomi","Veros", "Doina", 'Brahm Mansion - Door', 'Laruba Mansion - Door',"Berkeley Mansion - Door", "Alba", "Ondol", "Aljiba", 'Bodley Mansion - Door'];
+			const townnames = ['Rover Mansion - Door',"Yomi","Veros", "Doina", 'Brahm Mansion - Door', 'Laruba Mansion - Door',"Berkeley Mansion - Door", "Alba", "Ondol", "Aljiba", 'Bodley Mansion - Door'];
 			const townnames2 =  ["Jova", "Alba", "Ondol", "Aljiba", "Doina", 'Brahm Mansion - Door', "Yomi", "Veros", "Berkeley Mansion - Door", 'Laruba Mansion - Door','Bodley Mansion - Door','Rover Mansion - Door'];
 			attempts = 0;
             spoiler = [['town/mansion', 'maplocation']];
 			shuffleArray(townnames, rng);
 			shuffleArray(townnames2, rng);
+            townnames.unshift("Jova");
 			while (townnames.length > 0 && attempts <20){
 				
 				for (j=0; j<townnames2.length; j++){
-				
-					if (towns[townnames2[j]].onlyheight1){
-						if (towns[townnames[0]].height > 1){
-							
-							continue;
-						}
-					}
-					if (townnames[0] === townnames2[j] && (j+1) < townnames2.length){
-						
+                    
+					if (townnames[0] === townnames2[j] && (j == 0) && ((j+1) < townnames2.length)){
+                            log ("this is our normal location "+ townnames[0]);
+                            shuffleArray(townnames2, rng);
 							continue;
 						
 					}
 					if (townnames[0] == "Jova"){
 						if (towns[townnames2[j]].nojova){
-						
+                            log("tried to place jova in no jova location");
 							continue;
 						
 						}

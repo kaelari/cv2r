@@ -182,7 +182,7 @@ JSR $${loc.ram.toString(16)}
 			w.text = 'How \'bout\na whip?';
 		}
 		
-		w.price = randomInt(rng, 100, 150);
+		w.price = 125; //randomInt(rng, 100, 150);
 	});
 
 	// "value" property refers to the value added to 0x004A (RAM) when you own a weapon
@@ -256,7 +256,7 @@ JSR $${loc.ram.toString(16)}
 	});
 
 	inventory.forEach(i => {
-		i.price = i.crystal ? randomInt(rng, 50, 100) : 100;
+		i.price = i.crystal ? 75 : 100;
 		if (i.dracPart) {
 			if (opts.world && opts.world != i.destworld){
 				i.memory = 0x7002 + (i.destworld*10);

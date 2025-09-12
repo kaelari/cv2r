@@ -1,4 +1,44 @@
 # CHANGELOG
+## 1.8.15 
+* Fixed some minor issues with town-rando
+(Thanks Oranj for all of these)
+* Added expanded_flags
+* Added Boss-rando-plus
+* Added health-drops
+* Added scaled-xp
+* Added random-wardrobe
+* Added bank7expansion
+* Added minor tweak to assembler fixing comments
+
+
+## 1.8.14
+New Patches:
+* Added Yes Man Patch (Thanks Burb)
+* Added Requirement Rando (Thanks Burb!)
+* Unified Checks
+* Holy Garlic (Thanks Oranj)
+
+New Logic Modifiers:
+* Bodies in Orbs
+* Vanilla Jova
+
+New Sprites: 
+* Guardian Legend
+* Mike Jones (Startropics)
+* missingno
+* Wiener
+* Xexyz
+
+Other Changes:
+* Put checks in so buying an extra whip or crystal won't crash the game. This should never be needed but just in case.
+* Town rando can now place towns with height greater than 1 in veros and yomi spots. 
+* Pressing B on the inventory screen will deselect the currently pointed at item only.
+* A number of technical changes that won't affect the end user
+* Boss Randomizer can now place all 3 bosses in any location. killing the boss in drac's castle should win you the game. 
+* Added a check so if randomization fails 100 times it will error out instead of infinite looping. This may cause you to get an error but before it would just sit there until it timed out which could take several minutes. If 100 attempts fail there probably isn't a valid result
+* Fixed a bug that caused alba free check to always have laurels if friendly jova was on. 
+* Fixed a bug with map rando that caused blob to always take you to Jova.
+* With unified checks and fangs, fangs will replace a clue not a laurel
 
 ## 1.8.13
 * added yes man patch (Thanks Burb)

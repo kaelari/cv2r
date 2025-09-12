@@ -19,8 +19,8 @@ const whipbytes = [0x17, 0x08, 0x09, 0x10];
 const yoyobytes = [0x19, 0x0f, 0x19, 0x0f];
 
 // basis of module.exports content
-struc = require('./mike-jones.json');
-patbase = struc.patch;
+let struc = require('./mike-jones.json');
+let patbase = struc.patch;
 
 
 ////////////////

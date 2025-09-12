@@ -2,212 +2,215 @@ const wrap = require('word-wrap');
 const { core, utils: { log, shuffleArray, textToBytes } } = require('../../lib');
 const ITEM_WRAP = {};
 
+// ----------------------
+// Item grammar
+// ----------------------
 [
-	'dagger',
-	'silver knife',
-	'golden knife',
-	'holy water',
-	'diamond',
-	'sacred flame',
-	'rib',
-	'heart',
-	'eyeball',
-	'nail',
-	'ring',
-	'silk bag',
-	'magic cross'
+    'dagger',
+    'silver knife',
+    'golden knife',
+    'holy water',
+    'diamond',
+    'sacred flame',
+    'rib',
+    'heart',
+    'eyeball',
+    'nail',
+    'ring',
+    'silk bag',
+    'magic cross'
 ].forEach(item => {
-	ITEM_WRAP[item] = {
-		prefix: 'the',
-		suffix: 'is'
-	};
+    ITEM_WRAP[item] = {
+        prefix: 'the',
+        suffix: 'is'
+    };
 });
 
 [
-	'crystal',
-	'oak stake',
-	'whip'
+    'crystal',
+    'oak stake',
+    'whip'
 ].forEach(item => {
-	ITEM_WRAP[item] = {
-		prefix: item === 'oak stake' ? 'an' : 'a',
-		suffix: 'is'
-	};
+    ITEM_WRAP[item] = {
+        prefix: item === 'oak stake' ? 'an' : 'a',
+        suffix: 'is'
+    };
 });
 
-ITEM_WRAP.laurels = {
-	prefix: 'some',
-	suffix: 'are'
-};
+ITEM_WRAP.laurels = { prefix: 'some', suffix: 'are' };
+ITEM_WRAP.garlic = { prefix: 'some', suffix: 'is' };
+ITEM_WRAP.fangs = { prefix: 'the', suffix: 'are' };
+ITEM_WRAP.clue = { prefix: 'a', suffix: 'is' };
 
-ITEM_WRAP.garlic = {
-	prefix: 'some',
-	suffix: 'is'
-};
-
-ITEM_WRAP.fangs = {
-	prefix: 'the',
-	suffix: 'are'
-};
-ITEM_WRAP.clue = {
-	prefix: 'a',
-	suffix: 'is'
-	
-}
 function preWrap(item) {
-	return `${ITEM_WRAP[item].prefix} ${item}`;
+    if (!ITEM_WRAP[item]) return item;
+    return `${ITEM_WRAP[item].prefix} ${item}`;
 }
 
 function fullWrap(item) {
-	return `${ITEM_WRAP[item].prefix} ${item} ${ITEM_WRAP[item].suffix}`;
+    if (!ITEM_WRAP[item]) return item;
+    return `${ITEM_WRAP[item].prefix} ${item} ${ITEM_WRAP[item].suffix}`;
 }
 
+// ----------------------
+// Patch function
+// ----------------------
 module.exports = {
-	patch: function (pm, opts) {
-		const { rng } = opts;
-		const clues = [];
-		const isDoorRando = !!global.doorSpoiler;
+    patch: function (pm, opts) {
+        const { rng } = opts;
+        let clues = [];
+        const isDoorRando = !!global.doorSpoiler;
+        const isBossRando = !!global.bossRando;
 
-		global.spoiler.forEach(spoil => {
-			let [item, actor, location, entryRoom] = spoil;
-			
-			// don't leave clues for jova
-			if (location.includes('Jova')) { return; }
-			
-			const fulllocation = location;
-			
-			// remove location descriptors
-			location = location.replace(/-.*/, '');
+        // ----------------------
+        // Build clues
+        // ----------------------
+        global.spoiler.forEach(spoil => {
+            let [item, actor, location, entryRoom] = spoil;
 
-			// remove parenthesized text from location
-			location = location.replace(/\(.*/, '');
+            if (location.includes('Jova')) return;
 
-			// remove some text qualifiers to make messages shorter
-			location = location.replace(/ ?mansion/i, '');
-			location = location.trim();
+            const fullLocation = location;
 
-			// normalize whip and crystal text
-			if (item.includes('whip') || item.includes('morning star')) {
-				item = 'whip';
-			} else if (item.includes('crystal')) {
-				item = 'crystal';
-			}
+            // normalize location
+            location = location.replace(/-.*/, '');
+            location = location.replace(/\(.*/, '');
+            location = location.replace(/ ?mansion/i, '');
+            location = location.trim();
 
-			// set clue text based on actor type
-			if (actor === 'Death') {
-				clues.push(`Death guards ${preWrap(item)}`);
-			} else if (actor === 'Camilla') {
-				clues.push(`Camilla defends ${preWrap(item)}`);
+            // normalize item names
+            if (item.includes('whip') || item.includes('morning star')) {
+                item = 'whip';
+            } else if (item.includes('crystal')) {
+                item = 'crystal';
+            }
 
-			} else if (actor === 'merchant') {
-				if (isDoorRando) {
-					const sp = global.doorSpoiler.find(s => s[1] === entryRoom || s[1] ===fulllocation );
-					if (!sp) {
-						clues.push(`${fullWrap(item)} for sale in ${location}`);
-						
-					} else {
-						const door = sp[0].substring(0, sp[0].indexOf(' '));
-						clues.push(`Enter a door at ${door} to buy ${item}`);
-					}
-				} else {
-					clues.push(`${fullWrap(item)} for sale in ${location}`);
-				}
-			} else if (actor === 'sacred flame') {
-				clues.push(`${fullWrap(item)} hidden on Dabi's Path`);
-			} else if (actor === 'orb') {
-				clues.push(`${fullWrap(item)} sealed in ${location}'s orb`);
-			} else if (actor === 'crystal dude') {
-				clues.push(`${fullWrap(item)} free in ${location}`);
-			} else if (actor === 'secret merchant') {
-				if (location.includes('Storigoi')) {
-					clues.push(`graveyard duck has ${preWrap(item)}`);
-				} else {
-					clues.push(`garlic needed to get ${preWrap(item)}`);
-				}
-			} else if (actor === 'book') {
-				clues.push(`${fullWrap(item)} in a book in ${location}`);
-			} else {
-				// we didn't match any actor?! what's going on here
-				return;
+            let text = null;
 
-			}
-		});
+            // clue text logic
+            if (actor === 'Death') {
+                text = isBossRando
+                    ? `A boss in Brahms guards ${preWrap(item)}`
+                    : `Death guards ${preWrap(item)}`;
+            } else if (actor === 'Camilla') {
+                text = isBossRando
+                    ? `A boss in Laruba defends ${preWrap(item)}`
+                    : `Camilla defends ${preWrap(item)}`;
+            } else if (actor === 'merchant') {
+                if (isDoorRando) {
+                    const sp = global.doorSpoiler.find(
+                        s => s[1] === entryRoom || s[1] === fullLocation
+                    );
+                    if (!sp) {
+                        text = `${fullWrap(item)} for sale in ${location}`;
+                    } else {
+                        const door = sp[0].substring(0, sp[0].indexOf(' '));
+                        text = `Enter a door at ${door} to buy ${item}`;
+                    }
+                } else {
+                    text = `${fullWrap(item)} for sale in ${location}`;
+                }
+            } else if (actor === 'sacred flame') {
+                text = `${fullWrap(item)} hidden on Dabi's Path`;
+            } else if (actor === 'orb') {
+                text = `${fullWrap(item)} sealed in ${location}'s orb`;
+            } else if (actor === 'crystal dude') {
+                text = `${fullWrap(item)} free in ${location}`;
+            } else if (actor === 'secret merchant') {
+                if (location.includes('Storigoi')) {
+                    text = `graveyard duck has ${preWrap(item)}`;
+                } else {
+                    text = `garlic needed to get ${preWrap(item)}`;
+                }
+            } else if (actor === 'book') {
+                text = `${fullWrap(item)} in a book in ${location}`;
+            }
 
-		let shortest = 100;
-		for (let i = 0; i < clues.length; i++) {
-			clues[i] = wrap(clues[i], { indent: '', trim: true, width: 13 });
-			shortest = clues[i].length < shortest ? clues[i].length : shortest;
-		}
+            if (text) {
+                clues.push({
+                    text,
+                    item,
+                    actor,
+                    location: fullLocation,
+                    shortLocation: location
+                });
+            }
+        });
 
-		shuffleArray(clues, rng);
-		log('', true);
-		log('Book Clues', true);
-		log('----------', true);
-		core.forEach(loc => {
-			if (!loc.actors) { return; }
-			
-			loc.actors.filter(a => (a.itemName == "clue")).forEach(a => {
-				
-				let index = 0;
-				let maxlength = a.text.length;
-				if (maxlength < shortest) {
-					// we shorter than the shortest clue, this probably should never happen, we'll truncate later. set this so we'll match the shortest clue
-					maxlength = shortest;
-				}
-				while (clues[index] != null && clues[index].length > maxlength) {
-					
-					index += 1;
-				}
+        // ----------------------
+        // Wrap text + find shortest
+        // ----------------------
+        let shortest = 100;
+        for (let i = 0; i < clues.length; i++) {
+            clues[i].text = wrap(clues[i].text, {
+                indent: '',
+                trim: true,
+                width: 13
+            });
+            shortest =
+                clues[i].text.length < shortest
+                    ? clues[i].text.length
+                    : shortest;
+        }
 
-				if (maxlength === shortest) {
-					// set this back and then we'll truncate
-					maxlength = a.text.length;
-				}
+        shuffleArray(clues, rng);
 
-				clues[index] = clues[index].trim();
+        log('', true);
+        log('Book Clues', true);
+        log('----------', true);
 
-				// make sure new text does not exceed the text it is replacing
-				if (clues[index].length > maxlength) {
-					if (clues[index].length > maxlength) {
-						
-						clues[index] = clues[index].slice(0, maxlength - 1);
-					}
-				}
+        // ----------------------
+        // Place clues
+        // ----------------------
+        core.forEach(loc => {
+            if (!loc.actors) return;
 
-				log(`[${a.text.length}] ` + a.text.replace(/\n/g, ' '), true);
-				log(`[${clues[index].length}] ` + clues[index].replace(/\n/g, ' '), true);
-				log('---', true);
+            loc.actors.filter(a => a.itemName === 'clue').forEach(a => {
+                let index = 0;
+                let maxlength = a.text.length;
+                if (maxlength < shortest) {
+                    maxlength = shortest;
+                }
 
-				const textBytes = textToBytes(clues[index]);
-				pm.add(textBytes, a.textPointer);
-				a.text = clues[index];
-				// delete so we don't give the same clue twice
-				clues.splice(index, 1);
-				shortest = 1000;
-				for (let i = 0; i < clues.length; i++) {
-					shortest = clues[i].length < shortest ? clues[i].length : shortest;
-					
-				}
-			});
-		});
-// 		var i=0;
-// 		core.forEach(loc => {
-// 			if (!loc.actors) { return; }
-// 			loc.actors.forEach(actor => {	
-// 				if (!actor.textPointer) { return; }
-// 				const item = actor.itemName;
-// 				if (item === "clue"){
-// 					
-// 					const text = clues[i];
-// 					const textBytes = textToBytes(clues[i]);
-// 					pm.add(textBytes, actor.textPointer);
-// 					actor.text = text;
-// 					i++;
-// 				}
-// 				
-// 			});
-// 		});
-		
-		
-		
-	}
+                // find a clue that fits AND is not self-referencing
+                while (
+                    clues[index] &&
+                    (clues[index].text.length > maxlength ||
+                        clues[index].actor === a.type ||
+                        clues[index].location === loc.name)
+                ) {
+                    index++;
+                }
+
+                if (!clues[index]) return; // no valid clue available
+
+                let chosen = clues[index].text.trim();
+
+                if (maxlength === shortest) {
+                    maxlength = a.text.length;
+                }
+
+                if (chosen.length > maxlength) {
+                    chosen = chosen.slice(0, maxlength - 1);
+                }
+
+                log(`[${a.text.length}] ${a.text.replace(/\n/g, ' ')}`, true);
+                log(`[${chosen.length}] ${chosen.replace(/\n/g, ' ')}`, true);
+                log('---', true);
+
+                const textBytes = textToBytes(chosen);
+                pm.add(textBytes, a.textPointer);
+                a.text = chosen;
+
+                // remove used clue
+                clues.splice(index, 1);
+
+                // recompute shortest
+                shortest = clues.reduce(
+                    (min, c) => Math.min(min, c.text.length),
+                    1000
+                );
+            });
+        });
+    }
 };

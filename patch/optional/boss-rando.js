@@ -18,7 +18,7 @@ module.exports = {
 	patch: async function(pm, opts) {
 	
 		const { rng } = opts;
-        
+        global.bossRando = true;
         let locations= core.filter(loc => {
                 return loc.boss
             });
@@ -46,7 +46,7 @@ module.exports = {
             bossplaces.splice(place, 1);
             if (placingin == "death") {
              if (bossestoplace[boss] == "camilla"){
-                 locations[1].cam = true;
+                 locations[1].camilla = true;
                   pm.add([ cam.x, cam.y, cam.id, cam.data ], death.pointer);
              }
              if (bossestoplace[boss] == "death"){
@@ -122,7 +122,8 @@ module.exports = {
         }
             
         return;
-            
+        //old code no longer in use.
+        
         //actual switching, 
             let a = locations[0].actors[0]
             let b = locations[1].actors[0]
