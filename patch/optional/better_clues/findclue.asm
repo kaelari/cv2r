@@ -1,0 +1,16 @@
+PHP
+TYA
+PHA
+TXA
+PHA
+
+LDA #$00
+STA $7f
+
+
+PLA
+TAX
+PLA
+TAY
+PLP
+JMP $DF42
