@@ -36,7 +36,7 @@ Examples
   node .\bin\cv2r --palette rondo-of-burb cv2.nes
 
   # Generate a custom rom with a list of patches. per patch options can be done with a :option=value. 
-  node .\bin\cv2r --patch enemy-hp,hearts-patch,price-rando,town-rando:ondol=0 cv2.nes
+  node .\bin\cv2r --patch enemy-hp,100-hearts,price-rando,town-rando:ondol=0 cv2.nes
 
 Options
   -V, --version                      output the version number
