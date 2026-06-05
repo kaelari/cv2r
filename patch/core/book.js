@@ -176,7 +176,6 @@ module.exports = {
                 while (
                     clues[index] &&
                     (clues[index].text.length > maxlength ||
-                        clues[index].actor === a.type ||
                         clues[index].location === loc.name)
                 ) {
                     index++;
@@ -201,7 +200,7 @@ module.exports = {
                 const textBytes = textToBytes(chosen);
                 pm.add(textBytes, a.textPointer);
                 a.text = chosen;
-
+                a.hasclue= clues[index];
                 // remove used clue
                 clues.splice(index, 1);
 

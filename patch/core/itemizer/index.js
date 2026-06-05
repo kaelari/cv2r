@@ -150,19 +150,18 @@ const clone = () => Object.assign({}, visited);
 				const script = new vm.Script(funcCode + evalLogic(actor.requirements[logic]));
 				return script.runInNewContext();
 			});
-            const merchants = choices.filter(actor => actor.name === 'merchant');
 
-            if (merchants.length > 0 && !isDep) {
-                choices = merchants;
-            }
+			// removing old unified checks fix, so we can once again have whips (for example) in orbs (Oranj)
+			//const merchants = choices.filter(actor => actor.name === 'merchant');
+			//if (merchants.length > 0 && !isDep) {
+			//	choices = merchants;
+			//}
 		}
 		
 		// bail if we can't find an available actor
 		if (!choices.length) {
             
-            
-			console.log(`cannot find free actor for ${item}`);
-			throw new Error(`cannot find free actor for ${item}`);
+            throw new Error(`cannot find free actor for ${item}`);
 		}
         
 		// choose a random actor in `choices` subset and assign the item to it
@@ -183,17 +182,19 @@ const clone = () => Object.assign({}, visited);
 		baseFuncs[key] = `base.${key} = function ${key}(i) { return ${funcLogic(body)}; };`;
 	}
 
+	// Process clue items before the rest (Oranj)
+	// this is so orbs can have whips again (for example).
+	const itemClues = itemList.slice(0).filter(o => o == "clue");
+	itemClues.forEach( i => {processItem(i)} );
 	// Add items to actors based on dependencies, starting with progression items
 	itemDeps.forEach(i => {
-        
-        processItem(i, true);
-        
-        
-    });
-	const listCopy = itemList.slice(0);
-	listCopy.forEach(i => {processItem(i);
-        
-    });
+		processItem(i, true);
+	});
+	// And the rest
+	const listCopy = itemList.slice(0).filter(o => o != "clue");
+	listCopy.forEach( i => {
+		processItem(i);
+	});
 }
 
 // Write and re-route data that determines the sales icon and prices for all merchants

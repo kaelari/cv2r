@@ -118,7 +118,7 @@ module.exports = {
 		//////////////
 		// replace "prologue" screen contents with tabulated 2-letter flaglist.
 		// TOTAL BYTES AVAILABLE = 199
-
+    
 		let sortString = (stringg) => {
 				return stringg.split("").sort().join("");
 			};
@@ -131,7 +131,10 @@ module.exports = {
 			return [ (val & 0xff00) / 0x100, val & 0xff ];
 		};
 		// build and format a table of 2-character flags, return bytes
-		let hiddenflags = opts.patch.split(',').includes('hide-flags');
+        let hiddenflags = false;
+		if (opts.patch !== undefined){
+            hiddenflags = opts.patch.split(',').includes('hide-flags');
+        }
 		let halfway;
 		/*
 			(struct indexed from ptr table)
@@ -140,6 +143,7 @@ module.exports = {
 			1b $FE terminate string
 		*/
 		const getFlagListLines = (flaglist) => {
+            
 			let sidepad, betweenpad, perline;
 			let output = [];
 			// max flaglabel length of 3. 1-length labels are legacy only.
@@ -152,8 +156,8 @@ module.exports = {
 			flaglist = flaglist.slice(0, 6 * 7);  // truncate huge flag list.
 			let logic = opts.logic;
             let customjson = opts.customjson;
-			let listlabel;
-
+			let listlabel = "";
+            
 			if (flaglist.length > 41){
 				listlabel = null;
 			}
@@ -212,7 +216,7 @@ module.exports = {
 					output[output.length - 1] = 0xFE;
 				}
 				let slc = flaglist.slice( (r * perline), ((r + 1) * perline) );
-				//console.log(slc);
+				
 				let line = slc.map( a => a.padStart(3) ).join("".padStart(betweenpad));
 				output = output.concat(prologueCoordToBytes(12 + (r*2), sidepad))
 					.concat(textToBytes(line, TEXT_MAP_TITLE))
@@ -228,8 +232,11 @@ module.exports = {
 			output[output.length - 1] = 0xFE;  // 0xFE terminate text.
 			return output;
 		};
+        
+        
 		if (patchGroup.flaglabels && patchGroup.flaglabels.length){
-			patchGroup.add(getFlagListLines(patchGroup.flaglabels), 0x10366);
+			
+            patchGroup.add(getFlagListLines(patchGroup.flaglabels), 0x10366);
 		}
 		if (halfway){
 			halfway = 0x8356 + halfway;

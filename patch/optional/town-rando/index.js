@@ -350,11 +350,57 @@ module.exports = {
 	type: 'random',
     character: 'T',
 	patch: function (pm, opts) {
+        
         var spoiler = [];
 		const { logic, rng } = opts;
 		var attempts = 0;
         verosheight = 0;
         yomiheight = 0;
+        if (opts.config.all){
+            
+            for (let town in towns){
+                towns[town].nojova = false;
+                
+            }   
+        }
+        if (opts?.config?.ondol !== undefined) {
+            towns["Ondol"].nojova = !opts.config.ondol;
+        }
+        if (opts?.config?.alba !== undefined) {
+            towns["Alba"].nojova = !opts.config.alba;
+        }
+        if (opts?.config?.berkley !== undefined) {
+            towns["Berkeley Mansion - Door"].nojova = !opts.config.berkley;            
+        }
+        if (opts?.config?.veros !== undefined) {
+            towns["Veros"].nojova = !opts.config.veros;            
+        }
+        if (opts?.config?.aljiba !== undefined) {
+            towns["Aljiba"].nojova = !opts.config.aljiba;     
+            
+        }
+        if (opts?.config?.jova !== undefined) {
+            towns["Jova"].nojova = !opts.config.jova;            
+        }
+        if (opts?.config?.brahm !== undefined) {
+            towns["Brahm Mansion - Door"].nojova = !opts.config.brahm;            
+        }
+        if (opts?.config?.yomi !== undefined) {
+            towns["Yomi"].nojova = !opts.config.yomi;            
+        }
+        if (opts?.config?.doina !== undefined) {
+            towns["Doina"].nojova = !opts.config.doina;            
+        }
+        if (opts?.config?.rover !== undefined) {
+            towns["Rover Mansion - Door"].nojova = !opts.config.rover;            
+        }
+        if (opts?.config?.bodley !== undefined) {
+            towns["Bodley Mansion - Door"].nojova = !opts.config.bodley;            
+        }
+        if (opts?.config?.laruba !== undefined) {
+            towns["Laruba Mansion - Door"].nojova = !opts.config.laruba;            
+        }
+        
 		while (1){
 			const townnames = ['Rover Mansion - Door',"Yomi","Veros", "Doina", 'Brahm Mansion - Door', 'Laruba Mansion - Door',"Berkeley Mansion - Door", "Alba", "Ondol", "Aljiba", 'Bodley Mansion - Door'];
 			const townnames2 =  ["Jova", "Alba", "Ondol", "Aljiba", "Doina", 'Brahm Mansion - Door', "Yomi", "Veros", "Berkeley Mansion - Door", 'Laruba Mansion - Door','Bodley Mansion - Door','Rover Mansion - Door'];
@@ -374,11 +420,14 @@ module.exports = {
 						
 					}
 					if (townnames[0] == "Jova"){
+                        
 						if (towns[townnames2[j]].nojova){
+                            
                             log("tried to place jova in no jova location");
 							continue;
 						
 						}
+						
 					
 					}
 					copytown(townnames2[j], townnames[0], pm, logic);

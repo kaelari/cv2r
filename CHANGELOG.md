@@ -1,4 +1,10 @@
 # CHANGELOG
+## 1.8.15B4
+* Added support for per flag options and fixed related bugs.
+
+## 1.8.15B3
+* fixed an issue with item placements (That's Oranj)
+
 ## 1.8.15 
 * Fixed some minor issues with town-rando
 (Thanks Oranj for all of these)

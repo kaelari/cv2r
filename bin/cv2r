@@ -24,7 +24,6 @@ program
 	.version(require('../package.json').version)
 	.description(`${yellow('Castlevania II: Simon\'s Quest Randomizer')} by ${red('Blood')}${cyan('Sweat')}And${green('Code')}`)
 	.usage('[options] [vanilla_rom_file]')
-	.option('-d, --difficulty <difficulty>', 'difficulty setting for the game, see list below')
 	.option('-j, --json', 'output patch and spoiler as json, disables all other output')
 	.option('-l, --logic <logic>', 'logic to be applied to itemization')
 	.option('-o, --output <output>', 'filepath for randomized rom output')
@@ -107,14 +106,14 @@ program.outputHelp = function () {
 	console.log(gray('  # Generate a rom with the seed "BSAC" at standard difficulty'));
 	console.log(`  ${bin} --seed BSAC cv2.nes`);
 	console.log('');
-	console.log(gray('  # Generate a rom with the seed "BurbAndSath" at hard difficulty'));
-	console.log(`  ${bin} --seed BurbAndSath --difficulty hard cv2.nes`);
-	console.log('');
+// 	console.log(gray('  # Generate a rom with the seed "BurbAndSath" at hard difficulty'));
+// 	console.log(`  ${bin} --seed BurbAndSath --difficulty hard cv2.nes`);
+// 	console.log('');
 	console.log(gray('  # Generate a rom with a random seed using the "Rondo of Burb" palette'));
 	console.log(`  ${bin} --palette rondo-of-burb cv2.nes`);
 	console.log('');
 	console.log(gray('  # Generate a custom rom with a list of patches'));
-	console.log(`  ${bin} --patch enemy-hp,hearts-patch,price-rando cv2.nes`);
+	console.log(`  ${bin} --patch enemy-hp,hearts-patch,price-rando,town-rando:ondol=0 cv2.nes`);
 	console.log('');
 	console.log(cyan('Options'));
 	this.options
@@ -131,18 +130,18 @@ program.outputHelp = function () {
 	});
 
 	console.log('');
-	console.log(cyan('Difficulties'));
-	console.log('');
-	Object.keys(difficulty).forEach(key => {
-		const { description, patches } = difficulty[key];
-		process.stdout.write(`  * ${p(key)}`);
-		desc(description);
-		process.stdout.write(' '.repeat(longest + 4) + 'PATCHES: ');
-		desc(green(patches.join(', ')));
-		console.log('');
-	});
-
-	console.log('');
+// 	console.log(cyan('Difficulties'));
+// 	console.log('');
+// 	Object.keys(difficulty).forEach(key => {
+// 		const { description, patches } = difficulty[key];
+// 		process.stdout.write(`  * ${p(key)}`);
+// 		desc(description);
+// 		process.stdout.write(' '.repeat(longest + 4) + 'PATCHES: ');
+// 		desc(green(patches.join(', ')));
+// 		console.log('');
+// 	});
+// 
+// 	console.log('');
 	console.log(cyan('Patches'));
 	console.log('');
 	pm.getPatches().forEach(patch => {
