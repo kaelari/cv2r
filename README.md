@@ -2,7 +2,7 @@
 
 cv2r - Castlevania II: Simon's Quest Randomizer by **BloodSweatAndCode** and **Kaelari**. Come find me and the CV2R crew for chat on gameplay, racing, and development in the [Discord](https://discord.gg/wRrh5ZDrZz)!
 
-Also, you can skip this repository entirely if you just want to generate a seed and play by going to the [CV2R Website](https://cv2r.kaelari.tech).
+Also, you can skip this repository entirely if you just want to generate a seed and play by going to the [CV2R Website](https://cv2r.kaelari.tech). This is strongly recommended.
 
 ## supported platforms
 
@@ -19,6 +19,7 @@ Also, you can skip this repository entirely if you just want to generate a seed 
 ## usage
 
 ```
+(See 'cv2r --help' for full info)
 Castlevania II: Simon's Quest Randomizer by BloodSweatAndCode (tonylukasavage)
 
 Usage
@@ -28,17 +29,14 @@ Examples
   # Show this help
   node .\bin\cv2r --help
 
-  # Generate a rom with the seed "BSAC" at standard difficulty
+  # Generate a rom with the seed "BSAC" with no optional patches
   node .\bin\cv2r --seed BSAC cv2.nes
-
-  # Generate a rom with the seed "BurbAndSath" at hard difficulty
-  node .\bin\cv2r --seed BurbAndSath --difficulty hard cv2.nes
-
+  
   # Generate a rom with a random seed using the "Rondo of Burb" palette
   node .\bin\cv2r --palette rondo-of-burb cv2.nes
 
-  # Generate a custom rom with a list of patches
-  node .\bin\cv2r --patch enemy-hp,hearts-patch,price-rando cv2.nes
+  # Generate a custom rom with a list of patches. per patch options can be done with a :option=value. 
+  node .\bin\cv2r --patch enemy-hp,hearts-patch,price-rando,town-rando:ondol=0 cv2.nes
 
 Options
   -V, --version                      output the version number
@@ -51,19 +49,6 @@ Options
   -x, --patch <patches>              comma separated list of patches to apply, see list below
   -z, --debug                        enable debug output
 
-Difficulties
-
-  easy                               The easiest mode for CV2R. Lots of hearts, reduced penalties, and a little more sanity
-                                     around the enemization. A good place to start for brand new players.
-                                     PATCHES: double-hearts, 100-hearts, lazy-river, penalty-reduction
-
-  standard                           The most common way to run CV2R. Some heart buffs to keep the game moving, but that's
-                                     all the help you'll get. Merchant prices and enemy HP are randomized.
-                                     PATCHES: enemy-hp, 100-hearts, penalty-reduction, price-rando
-
-  hard                               Ready for a challenge? No help with your heart grinds. Merchant prices and enemy HP
-                                     randomized.
-                                     PATCHES: enemy-hp, price-rando
 
 
 Patches
@@ -79,8 +64,9 @@ Patches
   paint-it-black                     The only thing visible in the game is Simon, enemies, stairs, and a few visual cues
   penalty-reduction                  Keep half your hearts after game over
   price-rando                        Randomize merchant prices by +/-25%
-  samus                              Samus, minus the Power Suit
-
+  
+  More are available see cv2r --help for full list
+  
 Palettes
 
   rondo-of-burb                      Burb's custom color palette
@@ -98,7 +84,7 @@ Developer Flags
 I plan to make executables so this installation isn't necessary, but until then, follow these steps:
 
 1. Install [node.js](https://nodejs.org/en/)
-2. Download the latest build of [cv2r](https://github.com/tonylukasavage/cv2r/archive/master.zip)
+2. Download the latest build of [cv2r](https://github.com/kaelari/cv2r/archive/master.zip)
 3. Extract cv2r to a folder
 4. Copy a vanilla cv2 rom into the cv2r folder as "cv2.nes"
 5. In a command prompt:
