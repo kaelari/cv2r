@@ -3,11 +3,16 @@ const { bank, patchManager, utils: { modSubroutine } } = require('../../../lib')
 
 module.exports = {
 	patch: function (pm) {
-		const hasDiamondWarp = patchManager.optional.patches.includes('diamond-warp');
-		const hasDoorRando = patchManager.optional.patches.includes('door-rando');
+		const hasDiamondWarp = patchManager.optional.patches.some(
+                p => p.id === 'diamond-warp'
+            );
+		const hasDoorRando = patchManager.optional.patches.some(
+    p => p.id === 'door-rando'
+);
 		let code = '';
-
+        console.log(hasDoorRando);
 		if (hasDiamondWarp) {
+            console.log("diamondewarp on");
 			code += 'STA $6006\n';
 		}
 		if (hasDoorRando) {
