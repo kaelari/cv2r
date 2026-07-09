@@ -10,9 +10,7 @@ module.exports = {
     p => p.id === 'door-rando'
 );
 		let code = '';
-        console.log(hasDoorRando);
 		if (hasDiamondWarp) {
-            console.log("diamondewarp on");
 			code += 'STA $6006\n';
 		}
 		if (hasDoorRando) {
