@@ -66,6 +66,7 @@ function randomize(rng, { logic }) {
 			const name = r.toLowerCase().replace(/_/g, ' ');
 			counts[name] = !counts[name] ? 1 : counts[name] + 1;
 		});
+        
 	});
 	Object.keys(counts).forEach(key => countsSorted.push({ name: key, value: counts[key] }));
 	const itemDeps = countsSorted.sort((a, b) => b.value - a.value || a.name.localeCompare(b.name))

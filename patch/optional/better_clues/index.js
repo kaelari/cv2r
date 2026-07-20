@@ -55,7 +55,7 @@ module.exports = {
         var loop ="";
         for (let i = 0; i < values.length; i++) {
             const val = values[i];
-            console.log(val.hasclue);
+            
             if (itemnames[val.hasclue.item]){
             
             loop += `
@@ -106,7 +106,7 @@ rts
 Item${i}AlreadyOwned`
         
         }
-        console.log(loop);
+        
         var foo= modSubroutine(pm.name, asmFile('inner.asm'), bank[1], {
              values: {
                  loop : loop
@@ -114,7 +114,7 @@ Item${i}AlreadyOwned`
             }
             
         });
-        console.log(foo);
+        
          modSubroutine(pm.name, asmFile('findclue.asm'), bank[1], {
              values: {
                  loop_loc : foo.ram

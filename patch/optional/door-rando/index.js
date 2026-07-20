@@ -82,11 +82,11 @@ module.exports = {
 			}
 		});
 		var music = "LDA #$45\r\nJSR $C118";
-		pm.patches.forEach(patch => {
-			if (patch == "nomusic") {
-				music = "";
-			}
-		});
+		const hasNoMusic = pm.patches.some(p => p.id === "nomusic");
+
+        if (hasNoMusic) {
+            music = "";
+        }
 
 
 
