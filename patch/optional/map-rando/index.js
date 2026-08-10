@@ -137,6 +137,7 @@ const areas = {
 				glitch: 'HEART',
 				diamondWarp: 'HEART'
 			},
+            addrequires: "HEART",
 		},
 // 		mustbeleft: true,
 		heightoffsetpointer: 0xA180,
@@ -1177,7 +1178,7 @@ function countlogic(logic) {
 	return count;
 }
 function updatelogic(area, logic, townReqs) {
-//         console.log("updating logic for "+area + " with "+townReqs);
+         //console.log("updating logic for "+area + " with "+townReqs);
 		const actors = core
 				.filter(loc => loc.name === area)
 				.reduce((a, c) => {
@@ -1201,11 +1202,18 @@ function updatelogic(area, logic, townReqs) {
 				}
 				actor.requirements[logic] = newReqs;
 				
-//  					console.log(actor.locationName);
-//  					console.log(" now "+newReqs);
+  					//console.log(actor.locationName);
+  					//console.log(" now "+newReqs);
 				
 			});
-		
+		let linked = core.find(c => c.name == area).link;
+        if (linked !== undefined){ 
+            //console.log("Adjusting linked locations");
+            //console.log(linked);
+            //console.log(linked[0]+logic+townReqs);
+            updatelogic(linked[0], logic, townReqs);
+            
+        }
 		let doors = core.find(c => c.name == area).doors;
 			if (doors === undefined ){
 				return;
