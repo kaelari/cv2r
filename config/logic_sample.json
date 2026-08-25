@@ -8,146 +8,154 @@
 	{
 		"name": "Jova - Thorn Whip Room",
 		"actors": [
-			{"mustHave": "silk bag"}
+			{"mustHave": "thorn whip"}
 		]
 	},
 	{
 		"name": "Jova - Holy Water Room",
 		"actors": [
-			{"mustHave": "silver knife"}
+			{"mustHave": "holy water"}
 		]
 	},
 	{
 		"name": "Veros - Dagger Room",
 		"actors": [
-			{"mustHave": "thorn whip"}
+			{"mustHave": "dagger"}
 		]
 	},
 	{
 		"name": "Veros - Chain Whip Room",
 		"actors": [
-			{"mustHave": "garlic"}
+			{"mustHave": "chain whip"},
+			{"mustHave": "clue"}
 		]
 	},
 	{
 		"name": "Aljiba - Garlic Room",
 		"actors": [
-			{"mustHave": "oak stake"}
+			{"mustHave": "garlic"}
 		]
 	},
 	{
 		"name": "Aljiba - Laurels Room",
 		"actors": [
-			{"mustHave": "heart"}
+			{"mustHave": "laurels"}
 		]
 	},
 	{
 		"name": "Aljiba",
 		"actors": [
-			{"mustHave": "red crystal"}
+			{"mustHave": "blue crystal"}
 		]
 	},
 	{
 		"name": "Camilla Cemetery",
 		"actors": [
-			{"mustHave": "oak stake"}
+			{"mustHave": "silver knife"}
 		]
 	},
 	{
 		"name": "Alba",
 		"actors": [
-			{"mustHave": "blue crystal"}
+			{"mustHave": "red crystal"}
 		]
 	},
 	{
 		"name": "Alba - Garlic Room",
 		"actors": [
-			{"mustHave": "oak stake"}
+			{"mustHave": "garlic"}
 		]
 	},
 	{
 		"name": "Alba - Laurels Room",
 		"actors": [
-			{"mustHave": "chain whip"}
+			{"mustHave": "laurels"}
 		]
 	},
 	{
 		"name": "Ondol - Morning Star Room",
 		"actors": [
-			{"mustHave": "laurels"}
+			{"mustHave": "morning star"}
 		]
 	},
 	{
 		"name": "Ondol - Laurels Room",
 		"actors": [
-			{"mustHave": "morning star"}
+			{"mustHave": "laurels"}
 		]
 	},
 	{
 		"name": "Storigoi Graveyard (Blob Boost)",
 		"actors": [
-			{"mustHave": "oak stake"}
+			{"mustHave": "silk bag"}
 		]
 	},
 	
 	{
 		"name": "Dabi's Path - Part 2",
 		"actors": [
-			{"mustHave": "holy water"}
+			{"mustHave": "sacred flame"}
 		]
 	},
 	{
 		"name": "Doina - Laurels Room",
 		"actors": [
-			{"mustHave": "garlic"}
+			{"mustHave": "laurels"}
 		]
 	},
 	
 	{
 		"name": "Berkeley Mansion - Part 2",
 		"actors": [
-			{"mustHave": "eyeball"},
-			{"mustHave": "oak stake"}
+            {"mustHave": "clue"},
+			{"mustHave": "oak stake"}, 
+			{"mustHave": "clue"},
+			{"mustHave": "rib"}
 		]
 	},
 	
 	{
 		"name": "Rover Mansion - Part 2",
 		"actors": [
-			{"mustHave": "ring"},
-			{"mustHave": "nail"}
+			{"mustHave": "oak stake"},
+			{"mustHave": "heart"},
+			{"mustHave": "clue"},
+			{"mustHave": "clue"}
 		]
 	},
 	{
 		"name": "Brahm Mansion - Part 1",
 		"actors": [
-			{"mustHave": "diamond"}
-		]
+			{"mustHave": "clue"},
+			{"mustHave":"oak stake"}
+			]
+		
 	},
 	
 	{
 		"name": "Brahm Mansion - Death Fight",
 		"actors": [
-			{"mustHave": "sacred flame"}
+			{"mustHave": "golden knife"}
 		]
 	},
 	{
 		"name": "Brahm Mansion - Orb Room",
 		"actors": [
-			{"mustHave": "rib"}
+			{"mustHave": "eyeball"}
 		]
 	},
 	{
 		"name": "Vrad Mountain - Part 2 (Diamond Dude)",
 		"actors": [
-			{"mustHave": "laurels"}
+			{"mustHave": "diamond"}
 		]
 	},
 	{
 		"name": "Bodley Mansion - Part 2",
 		"actors": [
-			{"mustHave": "dagger"},
-			{"mustHave": "flame whip"}
+			{"mustHave": "oak stake"},
+			{"mustHave": "clue"},
+			{"mustHave": "nail"}
 		]
 	},
 	
@@ -155,25 +163,62 @@
 	{
 		"name": "Laruba Mansion - Part 2",
 		"actors": [
-			{"mustHave": "laurels"},
+			{"mustHave": "oak stake"},
 			{"mustHave": "laurels"}
 		]
 	},
 	{ "name": "Laruba Mansion - Camilla Fight",
 		"actors": [
-			{"mustHave": "laurels"}
+			{"mustHave": "magic cross"}
 		]
 	},
 	{ "name": "Laruba Mansion - Orb Room",
 		"actors": [
-			{"mustHave": "golden knife"}
+			{"mustHave": "ring"}
 		]
 	},
 	{ "name": "Debious Woods - Part 3",
 		"actors": [
-			{"mustHave": "magic cross"}
+			{"mustHave": "flame whip"}
+		]
+	},
+	{
+		"name": "Jam Wasteland (Deborah Cliff)",
+		"actors": [
+			{"mustHave": "clue"}
+		]
+	},
+	{
+		"name": "Aljiba - Book Room Before Old Lady",
+		"actors": [
+			{"mustHave": "clue"}
+		]
+	},
+	{
+		"name": "Berkeley Mansion - Part 1",
+		"actors": [
+			{"mustHave": "clue"}
+		]
+	},
+	{
+		"name": "Aljiba Woods - Part 1",
+		"actors": [
+			{"mustHave": "clue"}
+		]
+	},
+	{
+		"name": "Joma Marsh - Part 3 (Fire and Skulls)",
+		"actors": [
+			{"mustHave": "clue"}
+		]
+	},
+	{
+		"name": "Brahm Mansion - Part 2",
+		"actors": [
+			{"mustHave": "clue"}
 		]
 	}
+	
 	
 	
 ]
