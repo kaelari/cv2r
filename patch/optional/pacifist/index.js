@@ -26,9 +26,9 @@ module.exports = {
 			}
 			
 		});
-        
-        
-        
+
+        // prevent drac scythes from dropping hearts
+        pm.add([0xc6], 0x76a0);
     },
     
 };
