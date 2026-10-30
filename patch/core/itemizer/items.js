@@ -32,12 +32,10 @@ const ITEM_COUNT_ORDER = [
 	'fangs',
 	'clue'
 ];
-var MAX_ITEM_LOCATIONS =45;
+var MAX_ITEM_LOCATIONS =32;
 
 if (global.uc){ 
     MAX_ITEM_LOCATIONS = 45;    
-}else {
-    MAX_ITEM_LOCATIONS = 32;
 }
 function getWhips(opts) {
 	if (opts.world){
@@ -51,10 +49,10 @@ function getWhips(opts) {
 	}
 	return [
 		// { name: 'leather whip', value: 0x00, icon: 0x5B },
-		{ name: 'thorn whip', type: 'whip', value: 0x01, icon: 0x5B, bankCode: [] },
-		{ name: 'chain whip', type: 'whip', value: 0x02, icon: 0x5B, bankCode: [] },
-		{ name: 'morning star', type: 'whip', value: 0x03, icon: 0x5B, bankCode: [] },
-		{ name: 'flame whip', type: 'whip', value: 0x04, icon: 0x5B, bankCode: [] }
+		{ name: 'thorn whip', type: 'whip', value: 0x01, icon: 0x5B, count:1, bankCode: [] },
+		{ name: 'chain whip', type: 'whip', value: 0x02, icon: 0x5B, count:1, bankCode: [] },
+		{ name: 'morning star', type: 'whip', value: 0x03, icon: 0x5B, count:1, bankCode: [] },
+		{ name: 'flame whip', type: 'whip', value: 0x04, icon: 0x5B, count:1, bankCode: [] }
 	];
 }
 
@@ -69,12 +67,12 @@ function getWeapons(opts) {
 		return object;
 	}
 	return [
-		{ name: 'dagger', type: 'weapon', value: 0x01, icon: 0x54, price: 50 },
-		{ name: 'silver knife', type: 'weapon', value: 0x02, icon: 0x55, price: 50 },
-		{ name: 'golden knife', type: 'weapon', value: 0x04, icon: 0x6F, price: 125 },
-		{ name: 'holy water', type: 'weapon', value: 0x08, icon: 0x57, price: 50 },
-		{ name: 'diamond', type: 'weapon', value: 0x10, icon: 0x70, price: 50 },
-		{ name: 'sacred flame', type: 'weapon', value: 0x20, icon: 0x69, price: 75 },
+		{ name: 'dagger', type: 'weapon', value: 0x01, icon: 0x54, count:1, price: 50 },
+		{ name: 'silver knife', type: 'weapon', value: 0x02, icon: 0x55, count:1, price: 50 },
+		{ name: 'golden knife', type: 'weapon', value: 0x04, icon: 0x6F, count:1, price: 125 },
+		{ name: 'holy water', type: 'weapon', value: 0x08, icon: 0x57, count:1, price: 50 },
+		{ name: 'diamond', type: 'weapon', value: 0x10, icon: 0x70, count:1, price: 50 },
+		{ name: 'sacred flame', type: 'weapon', value: 0x20, icon: 0x69, count:1, price: 75 },
 		{ name: 'oak stake', type: 'weapon', value: 0x40, icon: 0x59, price: 50, count: 5 }
 	];
 }
@@ -91,14 +89,14 @@ function getInventory(opts) {
 		return object;
 	}
 	return [
-		{ name: 'rib', type: 'inventory', value: 0x01, icon: 0x4E, dracPart: true },
-		{ name: 'heart', type: 'inventory', value: 0x02, icon: 0x4F, dracPart: true },
-		{ name: 'eyeball', type: 'inventory', value: 0x04, icon: 0x50, dracPart: true },
-		{ name: 'nail', type: 'inventory', value: 0x08, icon: 0x51, dracPart: true },
-		{ name: 'ring', type: 'inventory', value: 0x10, icon: 0x52, dracPart: true },
-		{ name: 'white crystal', type: 'inventory', value: 0x20, icon: 0x5E, crystal: true, bankCode: [] },
-		{ name: 'blue crystal', type: 'inventory', value: 0x40, icon: 0x6E, crystal: true, bankCode: [] },
-		{ name: 'red crystal', type: 'inventory', value: 0x60, icon: 0x5F, crystal: true, bankCode: [] }
+		{ name: 'rib', type: 'inventory', value: 0x01, icon: 0x4E, count:1, dracPart: true },
+		{ name: 'heart', type: 'inventory', value: 0x02, icon: 0x4F, count:1, dracPart: true },
+		{ name: 'eyeball', type: 'inventory', value: 0x04, icon: 0x50, count:1, dracPart: true },
+		{ name: 'nail', type: 'inventory', value: 0x08, icon: 0x51, count:1, dracPart: true },
+		{ name: 'ring', type: 'inventory', value: 0x10, icon: 0x52, count:1, dracPart: true },
+		{ name: 'white crystal', type: 'inventory', value: 0x20, icon: 0x5E, crystal: true, count:1, bankCode: [] },
+		{ name: 'blue crystal', type: 'inventory', value: 0x40, icon: 0x6E, crystal: true, count:1, bankCode: [] },
+		{ name: 'red crystal', type: 'inventory', value: 0x60, icon: 0x5F, crystal: true, count:1, bankCode: [] }
 	];
 }
 
@@ -120,8 +118,8 @@ function getCarry(hasFangs= false, opts) {
 	
 	
 	let carryItems = [
-		{ name: 'silk bag', type: 'carry', value: 0x01, icon: 0x5C, price: 100 },
-		{ name: 'magic cross', type: 'carry', value: 0x02, icon: 0x5A, price: 100 },
+		{ name: 'silk bag', type: 'carry', value: 0x01, icon: 0x5C, count:1, price: 100 },
+		{ name: 'magic cross', type: 'carry', value: 0x02, icon: 0x5A, count:1, price: 100 },
 		{ name: 'garlic', type: 'carry', value: 0x08, icon: 0x6D, price: 50, count: 2, bankCode: [], freeBankCode: [] }
 	];
     
@@ -468,6 +466,7 @@ items.push(...allItems);
 
 function applyItemCounts(itemList, counts) {
 	if (!counts || !Array.isArray(counts)) {
+        
 		return itemList;
 	}
 

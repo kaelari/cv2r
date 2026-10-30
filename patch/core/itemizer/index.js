@@ -487,7 +487,7 @@ STA *$01
 			}
 
 			// Book code
-			if (actor.name === 'book') {
+			if (actor.name === 'book' ) {
                 
 				bookValues["value_"+actor["7F"]] = item.code;
 			}
@@ -679,7 +679,7 @@ RTS
 				padding: 4
 			}
 		});
-        
+        if (global.uc){
         safeModSubroutine(pm.name, asmFile('book.asm'), bank[1], {
             values: bookValues,
             invoke: {
@@ -687,7 +687,7 @@ RTS
                 jump: 1
             }
         });
-        
+        }
 	}
 	
 };
