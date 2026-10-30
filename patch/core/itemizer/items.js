@@ -3,6 +3,42 @@ const { assemble, bank, utils: { randomInt, modSubroutine } } = require('../../.
 
 let items = module.exports = [];
 
+//Whips will function all the same since they are progressive but could in theory be used for logic.
+
+const ITEM_COUNT_ORDER = [
+	'thorn whip',
+	'chain whip',
+	'morning star',
+	'flame whip',
+	'dagger',
+	'silver knife',
+	'golden knife',
+	'holy water',
+	'diamond',
+	'sacred flame',
+	'oak stake',
+	'rib',
+	'heart',
+	'eyeball',
+	'nail',
+	'ring',
+	'white crystal',
+	'blue crystal',
+	'red crystal',
+	'silk bag',
+	'magic cross',
+	'garlic',
+	'laurels',
+	'fangs',
+	'clue'
+];
+var MAX_ITEM_LOCATIONS =45;
+
+if (global.uc){ 
+    MAX_ITEM_LOCATIONS = 45;    
+}else {
+    MAX_ITEM_LOCATIONS = 32;
+}
 function getWhips(opts) {
 	if (opts.world){
 		//we're multiworld
@@ -88,10 +124,13 @@ function getCarry(hasFangs= false, opts) {
 		{ name: 'magic cross', type: 'carry', value: 0x02, icon: 0x5A, price: 100 },
 		{ name: 'garlic', type: 'carry', value: 0x08, icon: 0x6D, price: 50, count: 2, bankCode: [], freeBankCode: [] }
 	];
+    
+    
+    
+    
 	if (hasFangs && !global.uc) {
 		carryItems.push(
 			{ name: 'laurels', type: 'carry', value: 0x04, icon: 0x58, price: 50, count: 4, bankCode: [], freeBankCode: [] },
-			{ name: 'fangs', type: 'carry', value: 0x10, icon: 0x4D, price: 100 }
 		);
 	} else {
 		carryItems.push(
@@ -99,18 +138,37 @@ function getCarry(hasFangs= false, opts) {
 		);
  		
 	}
-	if (global.uc){
-        if (hasFangs) {
-           carryItems.push( { name: 'fangs', type: 'carry', value: 0x10, icon: 0x4D, price: 100 });
-           carryItems.push(
-  			{ name: 'clue', type: 'carry', value: 0x00, icon: 0x4D, price: 0, count: 12, bankCode: [] }
-            );
-        }else {
-            carryItems.push(
-                { name: 'clue', type: 'carry', value: 0x00, icon: 0x4D, price: 0, count: 13, bankCode: [] }
-            );
-        }
+    if (hasFangs) {
+		carryItems.push(
+			{ name: 'fangs', type: 'carry', value: 0x10, icon: 0x4D, price: 100, count: 1 }
+		);
+	} else {
+    
+        carryItems.push(
+			{ name: 'fangs', type: 'carry', value: 0x10, icon: 0x4D, price: 100, count: 0 }
+		);
     }
+    
+    const clueDefault = global.uc
+		? (hasFangs ? 12 : 13)
+		: 0;
+
+	carryItems.push({
+		name: 'clue',
+		type: 'carry',
+		value: 0x00,
+		icon: 0x4D,
+		price: 0,
+		count: clueDefault,
+		bankCode: []
+	});
+    
+    
+	return carryItems;
+    
+    
+    
+    
 	return carryItems;
 }
 
@@ -355,11 +413,12 @@ JSR $${loc2.ram.toString(16)}
 		}
 			
 	});
-
+    
 	// back to normal item handling, but only generating code for silk bag and cross
 	carry.forEach(c => {
 		if (c.value < 0x04 || c.value === 0x10) {
-			if (opts.world && (opts.world != c.destworld)){
+			
+            if (opts.world && (opts.world != c.destworld)){
 				
 				c.memory = 0x7003 + (c.destworld*10);
 				c.code = `
@@ -368,10 +427,8 @@ ORA #$${c.value.toString(16)}
 STA $${c.memory.toString(16)}
 	`;
 			}else {
-				
-				c.memory = 0x92;
-		
-		
+            
+            c.memory = 0x92;
 			c.code = `
 LDA *$${c.memory.toString(16)}
 ORA #$${c.value.toString(16)}
@@ -393,9 +450,93 @@ STA *$31
 				c.text = c.name;
 			}
 		}
+		
 	});
 
 	// add all processed items to the exported array
-	items.push(...whips, ...weapons, ...inventory, ...carry);
-	
+	var allItems = [
+	...whips,
+	...weapons,
+	...inventory,
+	...carry
+];
+
+allItems = applyItemCounts(allItems, opts.itemCounts);
+
+items.push(...allItems);
 };
+
+function applyItemCounts(itemList, counts) {
+	if (!counts || !Array.isArray(counts)) {
+		return itemList;
+	}
+
+	if (counts.length !== ITEM_COUNT_ORDER.length) {
+		throw new Error(
+			`--item-counts requires exactly ${ITEM_COUNT_ORDER.length} values ` +
+			`in this order:\n${ITEM_COUNT_ORDER.join(', ')}`
+		);
+	}
+
+	const requested = {};
+
+	ITEM_COUNT_ORDER.forEach((name, index) => {
+		const count = counts[index];
+
+		if (!Number.isInteger(count) || count < 0) {
+			throw new Error(
+				`Invalid count for "${name}": ${counts[index]}. ` +
+				`Counts must be non-negative integers.`
+			);
+		}
+
+		requested[name] = count;
+	});
+
+	// Apply the requested counts by NAME rather than array position.
+	itemList.forEach(item => {
+		if (Object.prototype.hasOwnProperty.call(requested, item.name)) {
+			item.count = requested[item.name];
+		}
+	});
+
+	// Remove items explicitly set to zero.
+	let result = itemList.filter(item => {
+		return item.count !== 0;
+	});
+
+	// Calculate the actual number of copies in the pool.
+	let total = result.reduce((sum, item) => {
+		return sum + (item.count ?? 1);
+	}, 0);
+
+	// Too many items means this configuration can never fit.
+	if (total > MAX_ITEM_LOCATIONS) {
+		throw new Error(
+			`--item-counts produces ${total} items, but there are only ` +
+			`${MAX_ITEM_LOCATIONS} item locations.`
+		);
+	}
+
+	// Fill unused locations with clues.
+	const clueCount = MAX_ITEM_LOCATIONS - total;
+
+	if (clueCount > 0) {
+		let clue = result.find(item => item.name === 'clue');
+        
+        
+		if (!clue) {
+            
+            let clueoriginal = itemList.find(item => item.name === 'clue');
+            
+			clueoriginal.count = clueCount;
+
+			result.push(clueoriginal);
+		} else {
+            
+			clue.count = (clue.count ?? 0) + clueCount;
+		}
+	}
+    
+	return result;
+}

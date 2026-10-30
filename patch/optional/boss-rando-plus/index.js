@@ -7,9 +7,23 @@
 //
 // $NNNN refers to RAM location. 0xNNNN refers to corresponding ROM location.
 //
+/*
+I have specific plans for a complete rewrite and refactor, which will
+also serve as a framework for adding new bosses.
+It will not happen soon.
+
+y yomi landlord replacement
+    oldman $35 can be werewolf x3000
+    or fireman x5000
+    priest $2d can be ghost x7000  (will refill HP)
+y berk under bossroom entrance
+* rover fake orb
+    it's a sack of sand. someone moved the orb.
+
+*/
 /////////////////////////
 
-let BOSSPLUS_CURRENT_VERSION = "0.2";
+let BOSSPLUS_CURRENT_VERSION = "0.4.2";
 
 //
 // idea list: invisible stairs - can we also walk down them?
@@ -28,11 +42,7 @@ Any mansion can have a boss, and they are not in plain sight. You must search.
 
 Rover bossroom has a.. vertical problem.
 
-And Rover purple block wrongwarp up to orb no longer works the way you expect. Don't do it.
-
 Bodley monster xp party has been nerfed a bit because I needed to steal some actors from somewhere.
-
-I haven't yet studied how to add more dialogue for new hintbooks "camilla is hiding in berkeley" etc.
 
 This should be compatible with harder camilla/death. probably.
 
@@ -115,7 +125,8 @@ bosses = [
 		actorblock: [0x08,0x0A,0x42,0xF0], // [x, y, type, HP]
 		ramaddr: 0x9ab6, // $9ab6 RAM addr of actorblock. we will swap pointers.
 		romaddr: 0x5ac6,
-		tilesheet:  0xA,  // for tiletableloc
+		tilesheet:  0xA,  // for tiletableloc (initial value, ignored if boss-rando)
+		waslaruba: true,
 	},
 	{	// berk
 		bossobj:    null,  // populate reference from current state of core
@@ -136,7 +147,7 @@ bosses = [
 		actorblock: [0x08,0x08,0x44,0x80], // [x, y, type, HP]
 		ramaddr: 0x9cce,   // $9ace RAM addr of actorblock. we will swap pointers.
 		romaddr: 0x5cde,
-		tilesheet:  0x9,  // for tiletableloc
+		tilesheet:  0x9,  // for tiletableloc (initial value, ignored if boss-rando)
 	},
 	{	// bod
 		bossobj:    null,  // populate reference from current state of core
@@ -150,15 +161,23 @@ bosses = [
 
 
 // just for fun
-//const drac_boss_info = [[0x08,0x08,0x47,0xF0], 0xc];
+//const yomi_boss_info = [[0x08,0x08,0x47,0xF0], 0xc];
 // 0xC7 for drac
-//const drac_boss_info = [[0x08,0x0a,0xc7,0x8], 0xc];
+//const yomi_boss_info = [[0x08,0x0a,0xc7,0x8], 0xc];
 // 97 zombie (can't damage in daytime!)
 // B6 becomes (small) heart
 // CE does something weird to the sound while onscreen, and can't use whip.
 // D5 copy of an active sprite, immobile?
-// make it a heart for now. how sweet.
-const drac_boss_info = [[0x0c,0x0c,0xb6,0xf0], 0x1];
+// B6 drops a heart
+// B7 is a heart
+// 3E falling rock
+// AD priest
+// B5 oldman
+//    oldman $35 can be werewolf x3000
+//    or fireman x5000
+//    priest $2d can be ghost x7000  (will refill HP)
+const yomi_boss_info = [[0x0c,0x0c,0xb5,0x0], 0x3];
+// TODO palette?
 
 
 ///////////////////////////////////////
@@ -233,9 +252,8 @@ const patchbase = [
 	{ "offset": 37453, "bytes": [ 78, 146, 2 ] },
 	// OLD $9246 reassign zone 1,2 ptrs to new loc in berk's extra space $8d57 $8d58,
 	// $9246 reassign zone 1,2 ptrs (6 7) to convenient bytes in local room and ptr $92d3 $92a5,
-	// OLD $924A and assign zone 3 to laruba bossroom $88e6 (expand table)
-	// $924A NOPE CAN'T DO THAT //and assign zone 3 to new connecting submap $92bb(expand table)
-	// $924C and assign zone 4 to laruba bossroom $88e6 (expand table)
+	// $924A and assign zone 3 to laruba bossroom $88e6 (expand table)
+	// OLD (was planned for a new "connecting" rover3) $924C and assign zone 4 to laruba bossroom $88e6 (expand table)
 	{ "offset": 37462, "bytes": [ 211, 146, 165, 146,  230, 136,  230, 136 ] },
 	// OLD $924C [DYNAMIC] shift entire rover gate struct down 2 bytes
 	// [DYNAMIC] move rover gate struct (11 bytes) from $924a to berkspace $8d54
@@ -453,29 +471,27 @@ const patchbase = [
 	// room placement:
 
 	// all:
-	// $87DF place empty nonblocking orbroom $9a19 in "blank" below bossroom
-	// [EDIT] no don't do that, breaks death drop.
-	//{ "offset": 34799, "bytes": [ 25, 154 ] },
-	// $87DF ok let's try this, place bodley1 room1 (NW corner) $9af5 in "blank" below bossroom
-	// [EDIT] nope don't do that.
-	// brahm2-2 $9891
-	// brahm2-7 $98c9
-	// bod2-8 $9e75
-	// laruba2-4 $8ad2 offset $7 = $8ad9 (wall of spikes)
-	// laruba 2-8 $8c92 offset $35 = $8cc7 (floor of spikes)
-	// $87e1 OK FOR REAL LET'S TRY THIS:
-	//       since we are obsoleting the standalone orb room, and it immediately
-	//       follows the standalone bossroom, we overwrite the first 2 bytes of
-	//       the old orb submap with a ptr to floor spikes, so anyone who tries
-	//       to purpleblockwrongwarp to rover's orb will respawn inside rover2.
-	{ "offset": 0x87f1, "bytes": [ 0xc7,0x8c ] },
+
+	// let's attempt to make failed death drop not be a trap.
+	// we use this for "empty" bossrooms in case you glitch into there.
+	// we'll use a piece of bodley2 NW corner $9BDB
+	{ "offset": 0x87ef, "bytes": [ 0xdb,0x9b ] },
+
+	// ..weird eldritch nonsense going out of bounds in map template list didn't work.
+	// $87e1 INSTEAD let's just repurpose the defunct standalone orbroom in-place.
+	//       give it bodley1's NE corner room $9b9d, then the same safety room underneath as the real bossroom.
+	//       this becomes 0x0C index in mansion maplist.
+	//pat.push( {"offset": 0x87f1, "bytes": [0x01,0x01,0x9d,0x9b,0xdb,0x9b]} );
+	{ "offset": 0x87f1, "bytes": [0x01,0x01,0x9d,0x9b,0xdb,0x9b] },
 
 	// laruba:
 	// $893c replace laruba2 room7 ptr to blocking orb room $8857
 	{ "offset": 35148, "bytes": [ 87, 136 ] },
 
 	// berk:
-	// (nothing)
+	// $8DDB replace the blank under SE corner of berk2 with something to jump up out of.
+	// we'll use rover1 room6 (middle of east wall) $944B
+	{ "offset": 36331, "bytes": [ 75, 148 ] },
 
 	// rover:
 	// $92A3 rover2 ptr to blocking orbroom $8857
@@ -565,6 +581,7 @@ function build_patch_stuff(pm, opts)
 	// yomi first so we can deepclone the actor
 	bossrooms[5].roomobj = z = core.find(loc => loc.name == bossrooms[5].oldroomname);
 	landlordtemplate = z.actors[0];
+	landlordtemplate.sprite = 0x01;  // tilesheet
 	bossrooms[5].req = core.filter(loc => loc.name == "Yomi")[0].doors.requirements[logic].slice();
 	z.name = bossrooms[5].changedroomname;
 	landlordtemplate.locationName = z.name;
@@ -573,6 +590,22 @@ function build_patch_stuff(pm, opts)
 	//         actors[0].requirements[logic]
 	bossrooms[0].roomobj = z = core.find(loc => loc.name == bossrooms[0].oldroomname);
 	bosses[0].bossobj = z.actors[0];
+	if (!bosses[0].bossobj.sprite) {
+		//console.log(bosses[0].bossobj.name+" in Laruba has no spritesheet, setting.");
+		// fine, we'll do the same hack as the enemizer for now, BUT THAT SHOULD BE FIXED TOO.
+		if (bosses[0].bossobj.name == "Camilla"){
+			bosses[0].bossobj.sprite = 0x0A;
+		}
+		else if (bosses[0].bossobj.name == "Death"){
+			bosses[0].bossobj.sprite = 0x09;
+		}
+		else if (bosses[0].bossobj.name == "Dracula"){
+			bosses[0].bossobj.sprite = 0x0C;
+		}
+	}
+	else{
+		//console.log(bosses[0].bossobj.name+" spritesheet is 0x"+bosses[0].bossobj.sprite.toString(16));
+	}
 	bossrooms[0].req = z.actors[0].requirements[logic].slice();
 	z.name = bossrooms[0].changedroomname;
 	z.actors.shift();
@@ -605,6 +638,22 @@ function build_patch_stuff(pm, opts)
 	//           actors[0].requirements[logic]
 	bossrooms[3].roomobj = z = core.find(loc => loc.name == bossrooms[3].oldroomname);
 	bosses[3].bossobj = z.actors[0];
+	if (!bosses[3].bossobj.sprite) {
+		//console.log(bosses[3].bossobj.name+" in Brahm has no spritesheet, setting.");
+		// fine, we'll do the same hack as the enemizer for now, BUT THAT SHOULD BE FIXED TOO.
+		if (bosses[3].bossobj.name == "Camilla"){
+			bosses[3].bossobj.sprite = 0x0A;
+		}
+		else if (bosses[3].bossobj.name == "Death"){
+			bosses[3].bossobj.sprite = 0x09;
+		}
+		else if (bosses[3].bossobj.name == "Dracula"){
+			bosses[3].bossobj.sprite = 0x0C;
+		}
+	}
+	else{
+		//console.log(bosses[3].bossobj.name+" spritesheet is 0x"+bosses[3].bossobj.sprite.toString(16));
+	}
 	bossrooms[3].req = z.actors[0].requirements[logic].slice();
 	z.name = bossrooms[3].changedroomname;
 	z.actors.shift();
@@ -647,17 +696,18 @@ function build_patch_stuff(pm, opts)
 		boss.area = room.area;
 		boss.submap = room.submap;
 		boss.locationName = room.name;
+
 		// $930a (0x531a) if camilla, set correct area value for itemdrop condition
-		// note: if more bosses are added, this must become more complicated.
-		if(boss.name == "Camilla") {
+		// TODO: when more bosses are added, this must become more complicated.
+		//if(boss.name == "Camilla") {
+		if(bosses[i].waslaruba) {
 			pat.push( {"offset": 0x531a, "bytes": [boss.area]} );
 		}
-
-		room.pattern["value"] = bosses[i].tilesheet;
+		//console.log(boss.name+" spritesheet insertion: 0x"+boss.sprite.toString(16));
+		room.pattern["value"] = bosses[i].bossobj.sprite;
 		room.pattern["pointer"] = bossrooms[i].tiletableloc;
 		room.actors.push(boss);
 	}
-
 
 	///////////
 	// [dynamic] mansion map stuff from above.
@@ -691,15 +741,24 @@ function build_patch_stuff(pm, opts)
 		pat.push( {"offset": 0x936a, "bytes": [0xd]} );
 		pat.push( {"offset": 0x9372, "bytes": [0xd]} );
 		pat.push( {"offset": 0x92c1, "bytes": [0x19,0x9a]} );
+	}else{
+		// $924A else point rover3 at a 0x0c index into the mansion map table $969b
+		//       (defunct vanilla brahm orbroom entry points at repurposed standalone orbroom mapchunk)
+		pat.push( {"offset": 0x925A, "bytes": [0x9b,0x96]} );
 	}
 
 	// $9705 [DYNAMIC] replace brahm corridor w passable orbroom $9a19(stock val) (if boss)
-	//           else nonpassable orbroom $8857
 	//{ "offset": 38677, "bytes": [ 25, 154 ] },
 	if(bosses[3].bossobj.boss) {
 		pat.push( {"offset": 0x9715, "bytes": [0x19, 0x9a]} );
 	}else{
+		//  else nonpassable orbroom $8857
 		pat.push( {"offset": 0x9715, "bytes": [0x57, 0x88]} );
+		//  and set bossroom to bodley1-3 LevelData_Screen_Map1_13_three ptr to ptr to $9b65 (northeast corner),
+		//  so david won't sue when he gets trapped from death dropping when no boss.
+		// $9693 point brahm3 at a 0x0c index into the mansion map table $969b
+		//       (defunct vanilla brahm orbroom entry points at repurposed standalone orbroom mapchunk)
+		pat.push( {"offset": 0x96A3, "bytes": [0x9b,0x96]} );
 	}
 
 	// $9e3d [DYNAMIC] bod2 room7 add breakable/passable walls to access underneath (if boss)
@@ -796,10 +855,14 @@ function build_patch_stuff(pm, opts)
 		b = b.slice(0, 0x2 * 4)
 			// insert new orb
 			.concat( [0xd, 0x7, 0x25, 0x19] )
-			// slice out enemy
-			.concat(b.slice(0x2 * 4, 0xc * 4))
+//			// slice out enemy
+//			.concat(b.slice(0x2 * 4, 0xc * 4))
+			// slice 2 enemies instead
+			.concat(b.slice(0x2 * 4, 0xb * 4))
 			// slice out old orb
 			.concat(b.slice(0xd * 4, 0x11 * 4))
+			// insert fake orb  (TODO: for now use a placeholder)
+			.concat( [0x3d, 0x15, 0x3e, 0x1] )
 			// truncate FF
 			.concat(b.slice(0x12 * 4, -1))
 			// append moving block
@@ -807,10 +870,17 @@ function build_patch_stuff(pm, opts)
 			// new FF
 			.concat( [0xff] );
 		pat.push( {"offset": idx, "bytes": b} );
+
+		// and then get a dialog entry for our new message. text index 0x16
+		//const { bank, utils: { modText } } = require('../../../lib');
+		//let mod = modText(pm.name, "a bag of\nsand?\nsomeone moved\nthe orb!", bank[3]);
+		//pm.add( [mod.ram % 0x100, mod.ram >>> 8], 0x8BAE + 0x4010 );
+
+
 	} else {  // no boss
 		// technically I don't need to do anything, but I don't want the presence
-		// of that one enemy to give away there isn't a boss here.
-		idx += 0xc * 4;
+		// of those 2 enemies to give away there isn't a boss here.
+		idx += 0xb * 4;
 		b = b.slice(0xd * 4);
 		pat.push( {"offset": idx, "bytes": b} );
 	}
@@ -904,12 +974,13 @@ function build_patch_stuff(pm, opts)
 	///////////
 	// boss room sprite indexes into enemizer zone table.
 	for(i=0;i<5;++i) {
-		pat.push( {"offset": bossrooms[i].tiletableloc, "bytes": [bosses[i].tilesheet]} );
+		//pat.push( {"offset": bossrooms[i].tiletableloc, "bytes": [bosses[i].tilesheet]} );
+		pat.push( {"offset": bossrooms[i].tiletableloc, "bytes": [bosses[i].bossobj.sprite]} );
 	}
 
-	// fun test: yomi landlord is drac
-	pat.push( {"offset": 0x520F, "bytes": drac_boss_info[0]} );
-	pat.push( {"offset": bossrooms[5].tiletableloc, "bytes": [drac_boss_info[1]]} );
+	// fun test: yomi landlord is ~~drac~~ a heart
+	pat.push( {"offset": 0x520F, "bytes": yomi_boss_info[0]} );
+	pat.push( {"offset": bossrooms[5].tiletableloc, "bytes": [yomi_boss_info[1]]} );
 
 
 
@@ -973,7 +1044,6 @@ module.exports =
 	id: "boss-rando-plus",
 	name: "Boss Rando Plus",
 	requires: "enemizer",
-	conflicts: "boss-rando",
 	version: BOSSPLUS_CURRENT_VERSION,
     author: "OranjSkueez",
 	description: "Randomizes which mansions have bosses.",

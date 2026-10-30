@@ -89,13 +89,11 @@ module.exports = {
 
             // clue text logic
             if (actor === 'Death') {
-                text = isBossRando
-                    ? `A boss in Brahms guards ${preWrap(item)}`
-                    : `Death guards ${preWrap(item)}`;
+                text = `Death guards ${preWrap(item)} in ${location}`;
             } else if (actor === 'Camilla') {
-                text = isBossRando
-                    ? `A boss in Laruba defends ${preWrap(item)}`
-                    : `Camilla defends ${preWrap(item)}`;
+                text = `Camilla defends ${preWrap(item)} in ${location}`;
+            } else if (actor === 'Dracula') {
+                text = `Dracula holds ${preWrap(item)} in ${location}`;
             } else if (actor === 'merchant') {
                 if (isDoorRando) {
                     const sp = global.doorSpoiler.find(

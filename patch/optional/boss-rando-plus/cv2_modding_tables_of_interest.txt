@@ -80,9 +80,9 @@ LevelData_ScreenNumbers_1_Mansions_9brahm_2
 7 LevelData_Screens_1_Mansions_7berkeley_A - rover 2
 
 8 LevelData_Screens_1_Mansions_8rover_A - brahm 1
-9 LevelData_Screens_1_Mansions_9_10_A - brahm 2  (2 entries?)
+9 LevelData_Screens_1_Mansions_9_10_A - brahm 2  (unused)(2 entries?)
 
-A (repeat brahm 2)
+A (repeat brahm 2) (actually used)
 
 B LevelData_Screens_1_Mansions_11_A - boss room
 C LevelData_Screens_1_Mansions_12_A - orb room
@@ -103,6 +103,7 @@ LevelData_Screen_Map2_16_17_and_2_18_and_3_10_and_4_5_6 - river banks?
 
 church face? LevelData_Screen_Map0_0_and_0_1_and_0_3_and_0_4
 
+THIS IS WRONG:
 0 doina LevelData_Screens_0_Towns_0aldra_A
 1 veros
 2 aljiba

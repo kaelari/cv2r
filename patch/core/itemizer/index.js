@@ -24,6 +24,24 @@ function asmFile(name) {
 	return path.join(__dirname, 'asm', name);
 }
 
+// Wraps modSubroutine to report exactly which asm file and which values
+// were in play when a template render fails, instead of a bare lodash
+// ReferenceError with no context.
+function safeModSubroutine(pmName, file, bankObj, config) {
+	try {
+		return modSubroutine(pmName, file, bankObj, config);
+	} catch (err) {
+		console.error(`### modSubroutine failed rendering: ${file} ###`);
+		if (config && config.values) {
+			console.error(`  values keys provided: ${Object.keys(config.values).join(', ')}`);
+		} else {
+			console.error('  no values object was provided');
+		}
+		console.error(`  ${err.message}`);
+		throw err;
+	}
+}
+
 // return an array of all actors that can hold an item
 function itemActors() {
     if (global.uc){
@@ -35,7 +53,7 @@ function itemActors() {
     }else {
         return core
             .filter(c => c.actors)
-            .map(c => c.actors.filter(a => (a.holdsItem && !a["7F"] )))
+            .map(c => c.actors.filter(a => (a.holdsItem && a.name !== "book" )))
             .filter(c => c.length > 0)
             .reduce((a, c) => a.concat(c), []);
         
@@ -53,14 +71,16 @@ function randomize(rng, { logic }) {
     
 	actors.forEach((a, index) => {
 		a.index = index;
-
+        //make sure these get reset if we do more than one loop.
+        delete a.newItem;
+        delete a.itemName;
 		// if we need to do randomization more than once, make sure to reset logic to original state
 		if (a.originalRequirements) {
 			a.requirements[logic] = a.originalRequirements;
 		} else {
 			a.originalRequirements = a.requirements[logic];
 		}
-
+        
 		// get a rough count of how often an item is required for prioritization of placement
 		a.requirements[logic].replace(/[()&|]/g, '').split(/\s+/).filter(r => r !== '').forEach(r => {
 			const name = r.toLowerCase().replace(/_/g, ' ');
@@ -77,7 +97,7 @@ function randomize(rng, { logic }) {
 	// maintained to avoid potential soft locks.
 	const itemList = [];
 	items.forEach(item => {
-		const count = item.count || 1;
+		const count = item.count ?? 0;
 		for (let i = 0; i < count; i++) {
 			itemList.push(item.name);
 		}
@@ -148,8 +168,16 @@ const clone = () => Object.assign({}, visited);
 				if (actor.name === "merchant" && item === "clue"){ return false;}
 				if (!isDep) { return true; }
 				if (actor.requirements[logic] === '') { return true; }
-				const script = new vm.Script(funcCode + evalLogic(actor.requirements[logic]));
-				return script.runInNewContext();
+				const evaluated = evalLogic(actor.requirements[logic]);
+				try {
+					const script = new vm.Script(funcCode + evaluated);
+					return script.runInNewContext();
+				} catch (evalErr) {
+					console.error(`Failed evaluating requirements logic for actor '${actor.name}' at '${actor.locationName}'`);
+					console.error(`  raw requirements: ${actor.requirements[logic]}`);
+					console.error(`  after evalLogic:  ${evaluated}`);
+					throw evalErr;
+				}
 			});
 
 			// removing old unified checks fix, so we can once again have whips (for example) in orbs (Oranj)
@@ -161,7 +189,7 @@ const clone = () => Object.assign({}, visited);
 		
 		// bail if we can't find an available actor
 		if (!choices.length) {
-            
+          
             throw new Error(`cannot find free actor for ${item}`);
 		}
         
@@ -253,7 +281,7 @@ function modSaleData(pm) {
 	// Hack in the code that lets us generate unique sales icons and prices for each
 	// individual merchant. The unhacked ROM shares a single entry for all garlic, laurel,
 	// and oak stake merchants.
-	modSubroutine(pm.name, asmFile('saleId.asm'), saleBank, {
+	safeModSubroutine(pm.name, asmFile('saleId.asm'), saleBank, {
 		exitOffset: 2,
 		values: saleValues,
 		invoke: {
@@ -309,7 +337,8 @@ module.exports = {
 			})
 		}else {
 		// randomize game items amongst all available actors. Retry if necessary.
-			errors = 0;
+			
+            let errors = 0;
             function wrapper() {
                 
 				try {
@@ -319,6 +348,7 @@ module.exports = {
                         errors += 1;
                         
                         if (errors >= 20){
+                            console.log(err.message);
                             throw new Error("couldn't place items after 20 attempts");
                         }
 						wrapper();
@@ -333,7 +363,7 @@ module.exports = {
 		const saleLoc = modSaleData(pm);
 
 		// re-write code that determines if a merchant is a whip merchant
-		modSubroutine(pm.name, asmFile('merchantId.asm'), bank[3], {
+		safeModSubroutine(pm.name, asmFile('merchantId.asm'), bank[3], {
 			invoke: {
 				romLoc: 0x1EDAE,
 				padding: 1
@@ -356,7 +386,7 @@ module.exports = {
 		const crystalIconsLoc = modData(pm.name, crystalIconsFile, bank[3]);
 
 		// dynamically load crystal icon for merchants based on currently owned crystal
-		modSubroutine(pm.name, asmFile('merchantIcon.asm'), bank[3], {
+		safeModSubroutine(pm.name, asmFile('merchantIcon.asm'), bank[3], {
 			invoke: {
 				romLoc: 0x1ECF4
 			},
@@ -368,7 +398,7 @@ module.exports = {
 		});
 
 		// dynamically load high byte of price for merchant sales
-		modSubroutine(pm.name, asmFile('merchantPrice.asm'), bank[3], {
+		safeModSubroutine(pm.name, asmFile('merchantPrice.asm'), bank[3], {
 			invoke: [
 				{ romLoc: 0x1ED04 },
 				{ romLoc: 0x1ED16 }
@@ -456,19 +486,19 @@ STA *$01
 				bank[3].offset += textBytes.length;
 			}
 
-			// Death code
-			if (actor.name === 'Death') {
-                deathValues.itemCode = item.code;
-			}
-            if (actor["7F"]) {
+			// Book code
+			if (actor.name === 'book') {
                 
-                bookValues["value_"+actor["7F"]] = item.code;
-                
-            }
-			// Death code
-			else if (actor.name === 'Camilla') {
-				camillaValues.itemCode = item.code;
+				bookValues["value_"+actor["7F"]] = item.code;
 			}
+			// Brahm boss code
+			else if (actor.vanillaName === 'Death') {
+				deathValues.itemCode = item.code;
+			}
+			// Laruba boss code
+			else if (actor.vanillaName === 'Camilla') {
+ 				camillaValues.itemCode = item.code;
+ 			}
 
 			// orb item assignment
 			else if (actor.name === 'orb') {
@@ -486,7 +516,11 @@ STA *$01
 
 			// process actors holding item code
 			else if (actor.code && actor.bank != null) {
-				let buf = Buffer.from(item.codeBytes);
+				
+                    
+                    
+               
+                let buf = Buffer.from(item.codeBytes);
 				let diff = actor.code.length - item.codeBytes.length;
 
 				// uh oh, too much item code for the given actor code space
@@ -555,15 +589,7 @@ STA *$01
 			const entryRoom = core.find(loc => loc.name === actor.locationName).entryRoom || '';
 
 			log(`${pad(item.name+actor.destworld, 15)} | ${pad(actor.name + (actor.name === 'merchant' ? ' (' + item.price + ')' : ''), 15)} | ${actor.locationName}`, true);
-            let aname = actor.name
-            if (isBossRando){
-                if (actor.name == "Death"){
-                    aname = "Brahm boss";
-                }
-                if (actor.name == "Camilla"){
-                    aname = "Laruba boss";
-                }
-            }
+			let aname = actor.name;
 			spoiler.push([item.name, aname, actor.locationName, entryRoom]);
 		}  );
 
@@ -573,7 +599,17 @@ STA *$01
 		const refuseText = modText(pm.name, 'nice try\nsimon', bank[3]);
 
 		// new garlic/laurel/oak merchant text and refuse text for progressive items
-		modSubroutine(pm.name, asmFile('textUnshare.asm'), bank[3], {
+        sharedItemTypes.forEach(itemType => {
+	if (!textValues[itemType]) {
+		textValues[itemType] = `
+LDA #$00
+STA *$00
+LDA #$00
+STA *$01
+`;
+	}
+});
+		safeModSubroutine(pm.name, asmFile('textUnshare.asm'), bank[3], {
 			exitOffset: 17,
 			values: Object.assign({
 				isChecked: memory.isChecked.ram.toString(16),
@@ -587,7 +623,7 @@ STA *$01
 		});
 
 		// Death code goes on bank 1
-		modSubroutine(pm.name, asmFile('boss.asm'), bank[1], {
+		safeModSubroutine(pm.name, asmFile('boss.asm'), bank[1], {
 			values: deathValues,
 			invoke: {
 				romLoc: 0x47D7,
@@ -596,7 +632,7 @@ STA *$01
 		});
 
 		// Camilla code goes on bank 1
-		modSubroutine(pm.name, asmFile('boss.asm'), bank[1], {
+		safeModSubroutine(pm.name, asmFile('boss.asm'), bank[1], {
 			values: camillaValues,
 			invoke: {
 				romLoc: 0x47CF,
@@ -605,13 +641,13 @@ STA *$01
 		});
 
 		// orb code goes on bank 1
-		modSubroutine(pm.name, asmFile('orb-7F.asm'), bank[1], {
+		safeModSubroutine(pm.name, asmFile('orb-7F.asm'), bank[1], {
 			invoke: {
 				romLoc: 0x47A4
 			}
 		});
 
-		modSubroutine(pm.name, asmFile('orb.asm'), bank[1], {
+		safeModSubroutine(pm.name, asmFile('orb.asm'), bank[1], {
 			values: orbValues,
 			invoke: {
 				romLoc: 0x47A7,
@@ -620,7 +656,14 @@ STA *$01
 		});
 
 		// whip merchant code goes on bank 3
-		modSubroutine(pm.name, asmFile('merchantWhip.asm'), bank[3], {
+		['thorn', 'chain', 'morningStar'].forEach(itemType => {
+	if (!whipMerchantValues[itemType]) {
+		whipMerchantValues[itemType] = `
+RTS
+`;
+	}
+});
+        safeModSubroutine(pm.name, asmFile('merchantWhip.asm'), bank[3], {
 			values: whipMerchantValues,
 			invoke: {
 				romLoc: 0x1EE04
@@ -628,7 +671,7 @@ STA *$01
 		});
 
 		// all other merchant code goes on bank 3
-		modSubroutine(pm.name, asmFile('merchant.asm'), bank[3], {
+		safeModSubroutine(pm.name, asmFile('merchant.asm'), bank[3], {
 			exitOffset: 4,
 			values: merchantValues,
 			invoke: {
@@ -636,15 +679,15 @@ STA *$01
 				padding: 4
 			}
 		});
-        if (global.uc){
-        modSubroutine(pm.name, asmFile('book.asm'), bank[1], {
+        
+        safeModSubroutine(pm.name, asmFile('book.asm'), bank[1], {
             values: bookValues,
             invoke: {
                 romLoc: 0x47EB,
                 jump: 1
             }
         });
-        }
+        
 	}
 	
 };

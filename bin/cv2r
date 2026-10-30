@@ -35,6 +35,7 @@ program
 	.option('-y, --show-spoilers', 'show spoilers in debug logging (must use with --debug)')
 	.option('-z, --debug', 'enable debug output')
 	.option('-c, --customjson <path>', 'Use a custom jsonfile')
+	.option('--item-counts <counts>', 'comma separated list of item counts, in item pool order')
 	.option('-m, --multiworld <number>', 'create a multiworld')
 	.option('-w, --world <number>', 'specify which world this is for multiworld')
 	
@@ -185,6 +186,21 @@ async function main() {
 	try {
 		// process command line arguments
 		program.parse(process.argv);
+		if (program.itemCounts) {
+	program.itemCounts = program.itemCounts
+		.split(',')
+		.map(count => {
+			const value = parseInt(count.trim(), 10);
+
+			if (isNaN(value) || value < 0) {
+				throw new Error(
+					`invalid item count "${count}". Item counts must be non-negative integers.`
+				);
+			}
+
+			return value;
+		});
+}
 		if (isCommand) { return; }
 
 		if (program.debug && !program.json) {
